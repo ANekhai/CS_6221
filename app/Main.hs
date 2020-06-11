@@ -6,4 +6,7 @@ import ImageToVector
 
 main :: IO ()
 main = do
-	toRGBRaw "images/test_image.jpg"
+    -- provide filepath and dimensions of new iage
+    to2DMatrix "images/test_image.jpg"
+    to2DMatrix "images/test_image2.jpg"
+-- to2DMatrix "images/test_image.jpg" Bilinear 25 25

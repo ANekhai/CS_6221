@@ -1,87 +1,74 @@
--- module Lib
---     ( someFunc
---     ) where
-
--- someFunc :: IO ()
--- someFunc = putStrLn "someFunc"
-
--- module Lib
--- ( loadImageToVector
--- ) where
-
--- import System.Environment
--- import qualified Graphics.Image as I
--- import Graphics.Image.Processing (rotate180)
--- import Graphics.Image.IO.Formats
--- import qualified Graphics.Image.Interface as IM
--- import qualified Graphics.Image.Interface.Repa as R
--- import Graphics.Image.ColorSpace
--- import Graphics.Image.Types
--- import Data.Word (Word8)
--- type BasicImage = (Image VS RGB Double)
-
--- loadImageToVector :: FilePath -> IO (Maybe BasicImage)
--- loadImageToVector path = do 
---   img <- I.readImage path :: IO(Either String BasicImage)
---   case img of 
--- 		Left err -> do
--- 			putStrLn $ "Error loading image."
--- 			print err
--- 			return Nothing
--- 		Right rgb -> do
--- 			return $ Just rgb 
-
 {-# LANGUAGE TypeSynonymInstances #-}
 
 module ImageToVector (
-toRGBRaw
+to2DMatrix
 ) where
 
-import Codec.Picture         (readImage, pixelAt, PixelRGB8(..))
+import Codec.Picture         
 import Codec.Picture.Types
+import Control.Arrow
+import Data.Ratio 
+import Data.Monoid
+import Graphics.Image.Processing
+-- import qualified Graphics.Image as I
+import qualified Data.Matrix as M
 import System.FilePath.Posix (splitExtension)
 
-toRGBRaw :: FilePath -> IO ()
-toRGBRaw fp = do
-    image <- readImage fp
-    case image of
+-- take image input with the filepath given as a DynamicImage type
+to2DMatrix :: FilePath -> IO ()
+to2DMatrix fp = do
+    imagedyn <- readImage fp
+    case imagedyn of
       Left _ -> putStrLn $ "Sorry, not a supported codec for " ++ fp
       Right dynimg -> do
-        let imgrgba8 = fromDynamicImage dynimg
+        let rle = twoDToMatrix $ pixelToInt $ greyscaleImage dynimg
         let (name, _) = splitExtension fp
-        writeFile (name ++ ".txt") (concat $ accumPixels imgrgba8)
+        writeFile (name ++ ".txt") (show rle)
 
-accumPixels :: Image PixelRGBA8 -> [String]
-accumPixels img@(Image w h _) = [ format (pixelAt img x y) x y | x <- [0..(w-1)], y <- [0..(h-1)]]
-  where format (PixelRGBA8 r g b _) j k = "#" ++ show r ++ "$"
-                                              ++ show g ++ "$"
-                                              ++ show b ++ "$"
-                                              ++ show j ++ "$"
-                                              ++ show k ++ "*\n"
+-- changeResolution :: Border () -> (Int, Int) -> (Image arr I.RGB Double) -> (Image arr cs e)
+-- changeResolution border (dim1, dim2) img = I.resize border (dim1, dim2) img
+
+-- convert DynamicImage to a Pixel8 image
+greyscaleImage :: DynamicImage -> Image Pixel8
+greyscaleImage = convertRGB8 >>> pixelMap greyscalePixel
+
+-- convert PixelsRGB8 image to Pixel8 image
+greyscalePixel :: PixelRGB8 -> Pixel8
+greyscalePixel (PixelRGB8 r g b) = round (wr + wg + wb)
+  where wr = toRational r * (3 % 10)
+        wg = toRational g * (59 % 100)
+        wb = toRational b * (11 % 100)
+        
+-- convert Pixel8 image to a 2-d matrix of integers
+pixelToInt :: Image Pixel8 -> [[Int]]
+pixelToInt =
+  map reverse . reverse .  snd . pixelFold -- because of the direction pixelFold works in, and the direction
+    (\(lastY, ps:pss) x y p ->             -- you add things to lists, reverse and map reverse are necessary
+      if y == lastY                        -- to make the output not mirrored horizontaly and vertically
+        then (y, (fromIntegral p:ps):pss)
+        else (y, [fromIntegral p]:ps:pss))
+    (0,[[]])
+
+-- converts list of lists to Data.Matrix type Matrix
+twoDToMatrix :: [[Int]] -> M.Matrix Int
+twoDToMatrix lists = M.fromLists lists
 
 
--- Copied from
--- See http://hackage.haskell.org/package/JuicyPixels-util-0.2/docs/Codec-Picture-RGBA8.html
 
-class ToPixelRGBA8 a where
-    toRGBA8 :: a -> PixelRGBA8
+--- draft code that tries to combine Graphics.Image and Codec.Picture by inputting, 
+-- then outputting, then inputting an image. Does not work 
 
-instance ToPixelRGBA8 Pixel8 where
-    toRGBA8 b = PixelRGBA8 b b b 255
-
-instance ToPixelRGBA8 PixelYA8 where
-    toRGBA8 (PixelYA8 l a) = PixelRGBA8 l l l a
-
-instance ToPixelRGBA8 PixelRGB8 where
-    toRGBA8 (PixelRGB8 r g b) = PixelRGBA8 r g b 255
-
-instance ToPixelRGBA8 PixelRGBA8 where
-    toRGBA8 = id
-
-fromDynamicImage :: DynamicImage -> Image PixelRGBA8
-fromDynamicImage (ImageY8 img) = pixelMap toRGBA8 img
-fromDynamicImage (ImageYA8 img) = pixelMap toRGBA8 img
-fromDynamicImage (ImageRGB8 img) = pixelMap toRGBA8 img
-fromDynamicImage (ImageRGBA8 img) = img
-
--- end of Codec.Picture.RGBA8
+-- to2DMatrix :: FilePath -> IO() -> (Int, Int) -> Border(String) -> IO () -> IO()
+-- to2DMatrix fp bor dim1 dim2 = do
+--     image_rgb <- I.readImageRGB VU fp
+--     case image_rgb of 
+--       Left _ -> putStrLn $ "Sorry, not a supported codec for " ++ fp
+--       Right dynimg -> do
+--         let dimensions = (dim1, dim2)
+--         new_image <- decodeImage $ I.resize bor dimensions dynimg
+--         case new_image of
+--           Left _ -> putStrLn $ "Sorry, not a supported codec for " ++ fp
+--           Right image -> do
+--             let rle = twoDToMatrix $ pixelToInt $ greyscaleImage image
+--             let (name, _) = splitExtension fp
+--             writeFile (name ++ ".txt") (show rle)
