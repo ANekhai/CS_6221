@@ -1,13 +1,14 @@
-module Math (
-    mult,
-    dot,
-    relu,
-    logistic,
-    softMax,
-    convolve,
-    maxPool
-    )
-    where
+module Math 
+(
+mult,
+dot,
+relu,
+logistic,
+softMax,
+convolve,
+maxPool,
+averagePool
+) where
 
 import Data.Matrix (Matrix)
 import Data.Vector (Vector)
@@ -47,9 +48,18 @@ softMax v = let normalizer = V.sum $ V.map exp v
             in V.map (/normalizer) $ V.map exp v
 
 
-convolve :: (Num a) => Matrix a -> Matrix a
+pad :: (Num a) => Int -> Matrix a -> Matrix a
+pad size m = undefined
+
+
+type Filter = Matrix
+
+convolve :: (Floating a) => Filter a -> Matrix a -> Matrix a
 convolve = undefined
 
 
 maxPool :: (Num a, Ord a) => Matrix a -> Matrix a
 maxPool = undefined
+
+averagePool :: (Floating a) => Matrix a -> Matrix a
+averagePool = undefined
