@@ -85,3 +85,8 @@ images/test_image2.jpg
 .stack-work/dist/x86_64-osx/Cabal-3.0.1.0/stack-build-caches/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/exe-image-exe
 .stack-work/dist/x86_64-osx/Cabal-3.0.1.0/stack-build-caches/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/lib
 .stack-work/install/x86_64-osx/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/8.8.3/pkgdb/package.cache
+.stack-work/stack.sqlite3.pantry-write-lock
+.stack-work/dist/x86_64-osx/Cabal-3.0.1.0/build-lock
+.stack-work/dist/x86_64-osx/Cabal-3.0.1.0/stack-cabal-mod
+.stack-work/dist/x86_64-osx/Cabal-3.0.1.0/package.conf.inplace/package.cache.lock
+.stack-work/install/x86_64-osx/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/8.8.3/pkgdb/package.cache.lock
