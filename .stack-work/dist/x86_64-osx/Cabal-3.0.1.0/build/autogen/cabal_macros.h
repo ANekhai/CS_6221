@@ -33,6 +33,17 @@
   (major1) == 4 && (major2) == 13 && (minor) <= 0)
 #endif /* MIN_VERSION_base */
 
+/* package containers-0.6.2.1 */
+#ifndef VERSION_containers
+#define VERSION_containers "0.6.2.1"
+#endif /* VERSION_containers */
+#ifndef MIN_VERSION_containers
+#define MIN_VERSION_containers(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  6 || \
+  (major1) == 0 && (major2) == 6 && (minor) <= 2)
+#endif /* MIN_VERSION_containers */
+
 /* package filepath-1.4.2.1 */
 #ifndef VERSION_filepath
 #define VERSION_filepath "1.4.2.1"
@@ -43,6 +54,50 @@
   (major1) == 1 && (major2) <  4 || \
   (major1) == 1 && (major2) == 4 && (minor) <= 2)
 #endif /* MIN_VERSION_filepath */
+
+/* package hip-1.5.6.0 */
+#ifndef VERSION_hip
+#define VERSION_hip "1.5.6.0"
+#endif /* VERSION_hip */
+#ifndef MIN_VERSION_hip
+#define MIN_VERSION_hip(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  5 || \
+  (major1) == 1 && (major2) == 5 && (minor) <= 6)
+#endif /* MIN_VERSION_hip */
+
+/* package matrix-0.3.6.1 */
+#ifndef VERSION_matrix
+#define VERSION_matrix "0.3.6.1"
+#endif /* VERSION_matrix */
+#ifndef MIN_VERSION_matrix
+#define MIN_VERSION_matrix(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  3 || \
+  (major1) == 0 && (major2) == 3 && (minor) <= 6)
+#endif /* MIN_VERSION_matrix */
+
+/* package vector-0.12.1.2 */
+#ifndef VERSION_vector
+#define VERSION_vector "0.12.1.2"
+#endif /* VERSION_vector */
+#ifndef MIN_VERSION_vector
+#define MIN_VERSION_vector(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  12 || \
+  (major1) == 0 && (major2) == 12 && (minor) <= 1)
+#endif /* MIN_VERSION_vector */
+
+/* tool cpphs-1.20.9 */
+#ifndef TOOL_VERSION_cpphs
+#define TOOL_VERSION_cpphs "1.20.9"
+#endif /* TOOL_VERSION_cpphs */
+#ifndef MIN_TOOL_VERSION_cpphs
+#define MIN_TOOL_VERSION_cpphs(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  20 || \
+  (major1) == 1 && (major2) == 20 && (minor) <= 9)
+#endif /* MIN_TOOL_VERSION_cpphs */
 
 /* tool gcc-11.0.3 */
 #ifndef TOOL_VERSION_gcc
@@ -88,6 +143,17 @@
   (major1) == 2 && (major2) == 23 && (minor) <= 0)
 #endif /* MIN_TOOL_VERSION_haddock */
 
+/* tool happy-1.19.12 */
+#ifndef TOOL_VERSION_happy
+#define TOOL_VERSION_happy "1.19.12"
+#endif /* TOOL_VERSION_happy */
+#ifndef MIN_TOOL_VERSION_happy
+#define MIN_TOOL_VERSION_happy(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  19 || \
+  (major1) == 1 && (major2) == 19 && (minor) <= 12)
+#endif /* MIN_TOOL_VERSION_happy */
+
 /* tool hpc-0.67 */
 #ifndef TOOL_VERSION_hpc
 #define TOOL_VERSION_hpc "0.67"
@@ -110,6 +176,17 @@
   (major1) == 0 && (major2) == 68 && (minor) <= 5)
 #endif /* MIN_TOOL_VERSION_hsc2hs */
 
+/* tool hscolour-1.24 */
+#ifndef TOOL_VERSION_hscolour
+#define TOOL_VERSION_hscolour "1.24"
+#endif /* TOOL_VERSION_hscolour */
+#ifndef MIN_TOOL_VERSION_hscolour
+#define MIN_TOOL_VERSION_hscolour(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  24 || \
+  (major1) == 1 && (major2) == 24 && (minor) <= 0)
+#endif /* MIN_TOOL_VERSION_hscolour */
+
 /* tool runghc-8.8.3 */
 #ifndef TOOL_VERSION_runghc
 #define TOOL_VERSION_runghc "8.8.3"
@@ -122,10 +199,10 @@
 #endif /* MIN_TOOL_VERSION_runghc */
 
 #ifndef CURRENT_PACKAGE_KEY
-#define CURRENT_PACKAGE_KEY "image-0.1.0.0-Jj4TgkDilaE2JOIxI5Z16R"
+#define CURRENT_PACKAGE_KEY "image-0.1.0.0-7CGfrbjG1VP9E0BqNW2az2"
 #endif /* CURRENT_PACKAGE_KEY */
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "image-0.1.0.0-Jj4TgkDilaE2JOIxI5Z16R"
+#define CURRENT_COMPONENT_ID "image-0.1.0.0-7CGfrbjG1VP9E0BqNW2az2"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.0"

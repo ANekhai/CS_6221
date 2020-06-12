@@ -3,18 +3,18 @@
   size: 45
   modtime: 1591663601
 /Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/image.cabal:
-  hash: 61752df9ef30fd2009311156fa472dc34e9ba20e553dcf347b509dbd3fa6b450
-  size: 1475
-  modtime: 1591769754
+  hash: f80299c504266f777741e32fe2cc4bf7f9df9835e091e01ce7c5239aa580dbd1
+  size: 1830
+  modtime: 1592004313
 /Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/package.yaml:
-  hash: 572ce2764f20bb91db0fcd67bfb19c2c9fe1ea9d2f9fafaa3d4de21bc50be2d7
-  size: 1163
-  modtime: 1591769327
+  hash: 4b859b2caa13d286db81f09652ef7ea28524003cf7ffb0549a4dbc90a3828a11
+  size: 1264
+  modtime: 1592004313
+/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/src/ImageToVector.hs:
+  hash: f6224a96dadfaf1f178f435c7845bf3bfa51d2c24842019705ff357761d454b6
+  size: 2318
+  modtime: 1592004313
 /Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/README.md:
   hash: cb398f312b63c5fb57aa9f914b2ff0061176dbd56125619620daec256df2828b
   size: 8
   modtime: 1591663601
-/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/src/Lib.hs:
-  hash: 4071b3785920dcc3798916b0b4a2839b3f4b023941583f4d0a510469c3107801
-  size: 2633
-  modtime: 1591769746

@@ -29,12 +29,12 @@ version :: Version
 version = Version [0,1,0,0] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
-bindir     = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/f1760b27bfb888fc851cfee2859f72ba8cc238602c2f26bfacafcbb94b9a2549/8.8.3/bin"
-libdir     = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/f1760b27bfb888fc851cfee2859f72ba8cc238602c2f26bfacafcbb94b9a2549/8.8.3/lib/x86_64-osx-ghc-8.8.3/image-0.1.0.0-Jj4TgkDilaE2JOIxI5Z16R"
-dynlibdir  = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/f1760b27bfb888fc851cfee2859f72ba8cc238602c2f26bfacafcbb94b9a2549/8.8.3/lib/x86_64-osx-ghc-8.8.3"
-datadir    = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/f1760b27bfb888fc851cfee2859f72ba8cc238602c2f26bfacafcbb94b9a2549/8.8.3/share/x86_64-osx-ghc-8.8.3/image-0.1.0.0"
-libexecdir = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/f1760b27bfb888fc851cfee2859f72ba8cc238602c2f26bfacafcbb94b9a2549/8.8.3/libexec/x86_64-osx-ghc-8.8.3/image-0.1.0.0"
-sysconfdir = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/f1760b27bfb888fc851cfee2859f72ba8cc238602c2f26bfacafcbb94b9a2549/8.8.3/etc"
+bindir     = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/8.8.3/bin"
+libdir     = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/8.8.3/lib/x86_64-osx-ghc-8.8.3/image-0.1.0.0-7CGfrbjG1VP9E0BqNW2az2"
+dynlibdir  = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/8.8.3/lib/x86_64-osx-ghc-8.8.3"
+datadir    = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/8.8.3/share/x86_64-osx-ghc-8.8.3/image-0.1.0.0"
+libexecdir = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/8.8.3/libexec/x86_64-osx-ghc-8.8.3/image-0.1.0.0"
+sysconfdir = "/Users/adimaini/Documents/GW/Advanced Software Paradigms/Project/CS_6221/.stack-work/install/x86_64-osx/0412420184badbba9b223d7152d464babfa6b3e92ddcda09c54ab33e50036cde/8.8.3/etc"
 
 getBinDir, getLibDir, getDynLibDir, getDataDir, getLibexecDir, getSysconfDir :: IO FilePath
 getBinDir = catchIO (getEnv "image_bindir") (\_ -> return bindir)
