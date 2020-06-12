@@ -1,7 +1,8 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
 module ImageToVector (
-to2DMatrix
+  to2DMatrix,
+  toWriteImage
 ) where
 
 import Codec.Picture         
@@ -10,32 +11,43 @@ import Control.Arrow
 import Data.Ratio 
 import Data.Monoid
 import Graphics.Image.Processing
--- import qualified Graphics.Image as I
+import qualified Graphics.Image as I
+import Graphics.Image.IO
+import Graphics.Image.IO.Formats
+import Graphics.Image.Interface.Vector
+import Graphics.Image.ColorSpace
+import qualified Data.Map as Map
+import qualified Graphics.Image.Interface as Interface
+import Data.Word (Word8)
 import qualified Data.Matrix as M
 import System.FilePath.Posix (splitExtension)
 
--- take image input with the filepath given as a DynamicImage type
-to2DMatrix :: FilePath -> IO(Maybe (M.Matrix Int))
-to2DMatrix fp = do
-    imagedyn <- readImage fp
-    case imagedyn of
-      Left _ -> return Nothing
-      Right dynimg -> do
-        let rle = twoDToMatrix $ pixelToInt $ greyscaleImage dynimg
-        return $ Just (rle)
-        -- let (name, _) = splitExtension fp
-        -- writeFile (name ++ ".txt") (show rle)
 
--- convert DynamicImage to a Pixel8 image
-greyscaleImage :: DynamicImage -> Image Pixel8
-greyscaleImage = convertRGB8 >>> pixelMap greyscalePixel
+-- takes an image filepath and outputs a 2D matrix
+to2DMatrix :: FilePath  -> (Int, Int) -> IO (Maybe (M.Matrix Int)) 
+to2DMatrix fp (dim1, dim2)= do
+    eimg <- I.readImageY VS fp 
+    let new_res :: Interface.Image VS I.Y Word8
+        new_res = I.resize Bilinear Edge  (dim1, dim2) $ Interface.map conv eimg
+    let rle = twoDToMatrix $ pixelToInt $ toJPImageY8 new_res
+    return $ Just (rle)
 
--- convert PixelsRGB8 image to Pixel8 image
-greyscalePixel :: PixelRGB8 -> Pixel8
-greyscalePixel (PixelRGB8 r g b) = round (wr + wg + wb)
-  where wr = toRational r * (3 % 10)
-        wg = toRational g * (59 % 100)
-        wb = toRational b * (11 % 100)
+-- takes an input and output filepaths and writes an image on the given path
+-- using the similar processing as the 'to2DMarix' so you can see what the matrix looks like
+-- only difference is that the this function outputs with Pixels in Double precision
+-- whereas the 'to2DMatrix' function outputs in Word8 precision (0-255 value for each pixel)
+toWriteImage :: FilePath -> FilePath -> (Int, Int) -> IO () 
+toWriteImage fp fpout (dim1, dim2)= do
+    eimg <- I.readImageY VS fp 
+    let new_res :: Interface.Image VS I.Y Double
+        new_res = I.resize Bilinear Edge (dim1, dim2) eimg
+    let (name, _) = splitExtension fp
+    I.writeImage fpout new_res
+
+-- convert image pixels from Double to Word8 using Functor
+conv :: Interface.Pixel I.Y Double -> Interface.Pixel I.Y Word8 
+conv d = Interface.toWord8 <$> d
+
         
 -- convert Pixel8 image to a 2-d matrix of integers
 pixelToInt :: Image Pixel8 -> [[Int]]

@@ -6,9 +6,11 @@ import System.FilePath.Posix (splitExtension)
 
 main :: IO ()
 main = do
-    -- provide filepath and dimensions of new iage
-    mat <- to2DMatrix "images/test_image.jpg"
+
+    -- if you just want the 2D matrix output from the image
+    -- define the number of pixels (or dimensions) of the image you want
+    mat <- to2DMatrix "images/test_image.jpg" (100, 100)
     writeFile ("images/test_image.txt") (show mat)
 
-    -- to2DMatrix "images/test_image2.jpg"
--- to2DMatrix "images/test_image.jpg" Bilinear 25 25
+    -- if you want to writesee the resolution, use this: 
+    toWriteImage "images/test_image.jpg" "images/test_image_output.jpg" (100, 100)
