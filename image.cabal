@@ -4,16 +4,16 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d7e723ff81e5cef8fc2bf9c1694b485104bed093ee5afe816e6ba22c6b93c5f1
+-- hash: 2d2e5175cb5d5aa25aaaa3164ef8be82c47aefee80dd98782edeb773e0ceac59
 
 name:           image
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/image#readme>
-homepage:       https://github.com/githubuser/image#readme
-bug-reports:    https://github.com/githubuser/image/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2020 Author name here
+homepage:       https://github.com//image#readme
+bug-reports:    https://github.com//image/issues
+author:         Adi Maini, Anton Nekhai
+maintainer:     adimaini@vt.edu
+copyright:      2020 Adi Maini & Anton Nekhai
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -23,18 +23,21 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/image
+  location: https://github.com//image
 
 library
   exposed-modules:
-      Lib
+      ImageToVector
   other-modules:
       Paths_image
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      JuicyPixels >=3.3.5
+    , base >=4.7 && <5
+    , filepath >=1.4.2.1
     , hip
+    , matrix
   default-language: Haskell2010
 
 executable image-exe
@@ -45,9 +48,12 @@ executable image-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      JuicyPixels >=3.3.5
+    , base >=4.7 && <5
+    , filepath >=1.4.2.1
     , hip
     , image
+    , matrix
   default-language: Haskell2010
 
 test-suite image-test
@@ -59,7 +65,10 @@ test-suite image-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      JuicyPixels >=3.3.5
+    , base >=4.7 && <5
+    , filepath >=1.4.2.1
     , hip
     , image
+    , matrix
   default-language: Haskell2010
