@@ -15,18 +15,16 @@ import qualified Data.Matrix as M
 import System.FilePath.Posix (splitExtension)
 
 -- take image input with the filepath given as a DynamicImage type
-to2DMatrix :: FilePath -> IO ()
+to2DMatrix :: FilePath -> IO(Maybe (M.Matrix Int))
 to2DMatrix fp = do
     imagedyn <- readImage fp
     case imagedyn of
-      Left _ -> putStrLn $ "Sorry, not a supported codec for " ++ fp
+      Left _ -> return Nothing
       Right dynimg -> do
         let rle = twoDToMatrix $ pixelToInt $ greyscaleImage dynimg
-        let (name, _) = splitExtension fp
-        writeFile (name ++ ".txt") (show rle)
-
--- changeResolution :: Border () -> (Int, Int) -> (Image arr I.RGB Double) -> (Image arr cs e)
--- changeResolution border (dim1, dim2) img = I.resize border (dim1, dim2) img
+        return $ Just (rle)
+        -- let (name, _) = splitExtension fp
+        -- writeFile (name ++ ".txt") (show rle)
 
 -- convert DynamicImage to a Pixel8 image
 greyscaleImage :: DynamicImage -> Image Pixel8
@@ -52,23 +50,3 @@ pixelToInt =
 -- converts list of lists to Data.Matrix type Matrix
 twoDToMatrix :: [[Int]] -> M.Matrix Int
 twoDToMatrix lists = M.fromLists lists
-
-
-
---- draft code that tries to combine Graphics.Image and Codec.Picture by inputting, 
--- then outputting, then inputting an image. Does not work 
-
--- to2DMatrix :: FilePath -> IO() -> (Int, Int) -> Border(String) -> IO () -> IO()
--- to2DMatrix fp bor dim1 dim2 = do
---     image_rgb <- I.readImageRGB VU fp
---     case image_rgb of 
---       Left _ -> putStrLn $ "Sorry, not a supported codec for " ++ fp
---       Right dynimg -> do
---         let dimensions = (dim1, dim2)
---         new_image <- decodeImage $ I.resize bor dimensions dynimg
---         case new_image of
---           Left _ -> putStrLn $ "Sorry, not a supported codec for " ++ fp
---           Right image -> do
---             let rle = twoDToMatrix $ pixelToInt $ greyscaleImage image
---             let (name, _) = splitExtension fp
---             writeFile (name ++ ".txt") (show rle)
