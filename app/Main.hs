@@ -1,6 +1,5 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Main where
+
 
 import ImageToVector
 import System.FilePath.Posix (splitExtension)
