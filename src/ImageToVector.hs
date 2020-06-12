@@ -16,7 +16,6 @@ import Graphics.Image.IO
 import Graphics.Image.IO.Formats
 import Graphics.Image.Interface.Vector
 import Graphics.Image.ColorSpace
-import qualified Data.Map as Map
 import qualified Graphics.Image.Interface as Interface
 import Data.Word (Word8)
 import qualified Data.Matrix as M
@@ -29,7 +28,7 @@ to2DMatrix fp (dim1, dim2)= do
     eimg <- I.readImageY VS fp 
     let new_res :: Interface.Image VS I.Y Word8
         new_res = I.resize Bilinear Edge  (dim1, dim2) $ Interface.map conv eimg
-    let rle = twoDToMatrix $ pixelToInt $ toJPImageY8 new_res
+    let rle = M.fromLists $ pixelToInt $ toJPImageY8 new_res
     return $ Just (rle)
 
 -- takes an input and output filepaths and writes an image on the given path
@@ -46,7 +45,7 @@ toWriteImage fp fpout (dim1, dim2)= do
 
 -- convert image pixels from Double to Word8 using Functor
 conv :: Interface.Pixel I.Y Double -> Interface.Pixel I.Y Word8 
-conv d = Interface.toWord8 <$> d
+conv d = fmap Interface.toWord8 d
 
         
 -- convert Pixel8 image to a 2-d matrix of integers
@@ -58,7 +57,3 @@ pixelToInt =
         then (y, (fromIntegral p:ps):pss)
         else (y, [fromIntegral p]:ps:pss))
     (0,[[]])
-
--- converts list of lists to Data.Matrix type Matrix
-twoDToMatrix :: [[Int]] -> M.Matrix Int
-twoDToMatrix lists = M.fromLists lists
