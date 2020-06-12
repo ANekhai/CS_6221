@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2d2e5175cb5d5aa25aaaa3164ef8be82c47aefee80dd98782edeb773e0ceac59
+-- hash: 40cd6c7b2b0bb92a44889c51f5eb9b4230ffc5a695c57b76752e3e4bc7d4ca99
 
 name:           image
 version:        0.1.0.0
@@ -35,9 +35,11 @@ library
   build-depends:
       JuicyPixels >=3.3.5
     , base >=4.7 && <5
+    , containers >=0.6.2.1
     , filepath >=1.4.2.1
     , hip
     , matrix
+    , vector >=0.12.1.2
   default-language: Haskell2010
 
 executable image-exe
@@ -50,10 +52,12 @@ executable image-exe
   build-depends:
       JuicyPixels >=3.3.5
     , base >=4.7 && <5
+    , containers >=0.6.2.1
     , filepath >=1.4.2.1
     , hip
     , image
     , matrix
+    , vector >=0.12.1.2
   default-language: Haskell2010
 
 test-suite image-test
@@ -67,8 +71,10 @@ test-suite image-test
   build-depends:
       JuicyPixels >=3.3.5
     , base >=4.7 && <5
+    , containers >=0.6.2.1
     , filepath >=1.4.2.1
     , hip
     , image
     , matrix
+    , vector >=0.12.1.2
   default-language: Haskell2010
