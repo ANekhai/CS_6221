@@ -22,6 +22,7 @@ import Data.Word (Word8)
 import qualified Data.Matrix as M
 import System.FilePath.Posix (splitExtension)
 
+
 -- takes an image filepath and outputs a 2D matrix
 to2DMatrix :: FilePath  -> (Int, Int) -> IO (Maybe (M.Matrix Int)) 
 to2DMatrix fp (dim1, dim2)= do
@@ -46,6 +47,7 @@ toWriteImage fp fpout (dim1, dim2)= do
 -- convert image pixels from Double to Word8 using Functor
 conv :: Interface.Pixel I.Y Double -> Interface.Pixel I.Y Word8 
 conv d = Interface.toWord8 <$> d
+
         
 -- convert Pixel8 image to a 2-d matrix of integers
 pixelToInt :: Image Pixel8 -> [[Int]]
