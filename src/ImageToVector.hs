@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
 module ImageToVector (
-to2DMatrix
+
 ) where
 
 import Codec.Picture         
@@ -10,34 +10,43 @@ import Control.Arrow
 import Data.Ratio 
 import Data.Monoid
 import Graphics.Image.Processing
--- import qualified Graphics.Image as I
+import qualified Graphics.Image as I
+import Graphics.Image.IO
+import Graphics.Image.IO.Formats
+import Graphics.Image.Interface.Vector
+-- import Graphics.Image.ColorSpace
+import qualified Data.Map as Map
+import qualified Graphics.Image.Interface as Interface
+import Data.Word (Word8)
+-- import Data.Vector (fromList)
 import qualified Data.Matrix as M
 import System.FilePath.Posix (splitExtension)
 
 -- take image input with the filepath given as a DynamicImage type
-to2DMatrix :: FilePath -> IO ()
-to2DMatrix fp = do
-    imagedyn <- readImage fp
-    case imagedyn of
-      Left _ -> putStrLn $ "Sorry, not a supported codec for " ++ fp
-      Right dynimg -> do
-        let rle = twoDToMatrix $ pixelToInt $ greyscaleImage dynimg
-        let (name, _) = splitExtension fp
-        writeFile (name ++ ".txt") (show rle)
+to2DMatrix :: FilePath -> FilePath -> Border(Interface.Pixel I.Y Word8) -> (Int, Int) -> IO ()
+to2DMatrix fp fpout bor (dim1, dim2)= do
+    eimg <- I.readImageY VS fp 
+    let new_res :: Interface.Image VS I.Y Word8
+        new_res = I.resize Bilinear bor (dim1, dim2) $ fmap conv eimg
+    let rle = twoDToMatrix $ pixelToInt $ toJPImageY8 new_res
+    let (name, _) = splitExtension fp
+    writeFile (name ++ ".txt") (show rle)
+    -- I.writeImage fpout new_res
 
--- changeResolution :: Border () -> (Int, Int) -> (Image arr I.RGB Double) -> (Image arr cs e)
--- changeResolution border (dim1, dim2) img = I.resize border (dim1, dim2) img
+-- convert image from Double to Word8
+conv :: Interface.Pixel I.Y Double -> Interface.Pixel I.Y Word8 
+conv d = floor $ fromIntegral d * 255
 
--- convert DynamicImage to a Pixel8 image
-greyscaleImage :: DynamicImage -> Image Pixel8
-greyscaleImage = convertRGB8 >>> pixelMap greyscalePixel
+-- -- convert DynamicImage to a Pixel8 image
+-- greyscaleImage :: DynamicImage -> Image Pixel8
+-- greyscaleImage = convertRGB8 >>> pixelMap greyscalePixel
 
--- convert PixelsRGB8 image to Pixel8 image
-greyscalePixel :: PixelRGB8 -> Pixel8
-greyscalePixel (PixelRGB8 r g b) = round (wr + wg + wb)
-  where wr = toRational r * (3 % 10)
-        wg = toRational g * (59 % 100)
-        wb = toRational b * (11 % 100)
+-- -- convert PixelsRGB8 image to Pixel8 image
+-- greyscalePixel :: PixelRGB8 ->  Pixel8
+-- greyscalePixel (PixelRGB8 r g b) = round (wr + wg + wb)
+--   where wr = toRational r * (3 % 10)
+--         wg = toRational g * (59 % 100)
+--         wb = toRational b * (11 % 100)
         
 -- convert Pixel8 image to a 2-d matrix of integers
 pixelToInt :: Image Pixel8 -> [[Int]]
