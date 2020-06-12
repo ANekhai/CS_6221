@@ -29,7 +29,7 @@ to2DMatrix fp (dim1, dim2)= do
     let new_res :: Interface.Image VS I.Y Word8
         new_res = I.resize Bilinear Edge  (dim1, dim2) $ Interface.map conv eimg
     let rle = M.fromLists $ pixelToInt $ toJPImageY8 new_res
-    return $ Just (rle)
+    return $ Just rle
 
 -- takes an input and output filepaths and writes an image on the given path
 -- using the similar processing as the 'to2DMarix' so you can see what the matrix looks like
@@ -45,7 +45,7 @@ toWriteImage fp fpout (dim1, dim2)= do
 
 -- convert image pixels from Double to Word8 using Functor
 conv :: Interface.Pixel I.Y Double -> Interface.Pixel I.Y Word8 
-conv d = fmap Interface.toWord8 d
+conv = fmap Interface.toWord8
 
         
 -- convert Pixel8 image to a 2-d matrix of integers
