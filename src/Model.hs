@@ -13,12 +13,16 @@ evalLinear,
 Scalar,
 Activation,
 evalLayer,
-eval
+eval,
+getRandomModel
 ) where 
 
+import Control.Monad
+import Data.Random.Normal
 import Data.Matrix (Matrix)
 import Data.Vector (Vector)
 import qualified Data.Vector as V
+import qualified Data.Matrix as M
 import Data.List
 import Math
 
@@ -48,4 +52,16 @@ newtype Model a = Model [Layer a]
 eval :: (Scalar a) => Model a -> Vector a -> Vector a
 eval (Model layers) x = foldl' (flip evalLayer) x layers
 
+-- generate a random model
+type LayerSpec = (Int, Activation)
+type Dimension = Int
+
+getRandomModel :: Dimension -> [LayerSpec] -> IO (Model Double)
+getRandomModel inputDimension layerSpecs = do 
+    let inputSizes = inputDimension : map fst layerSpecs 
+    layers <- forM (zip inputSizes layerSpecs) $ \(m, (n, activation)) -> do
+        weights <- fmap (M.fromList n m) $ replicateM (m * n) $ normalIO --TODO: change this so it generates weights ~N(0,1)
+        bias <- fmap V.fromList $ replicateM n $ normalIO
+        return (Layer (LP weights bias) activation)
+    return (Model layers)
 --TODO: Implement convolution and pooling layers for a CNN

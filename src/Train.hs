@@ -7,7 +7,7 @@ LossFn,
 squaredErrorLoss,
 logisticLoss,
 LearningRate
---trainMany
+trainMany
 ) where
 
 import Model
@@ -20,8 +20,6 @@ import qualified Data.Matrix as M
 
 
 --TODO: add batch processing (look into batch normalization), parallel or even GPU processing
-
-type LayerSpec = (Int, Activation)
 
 type LossFn = forall a. Scalar a => Vector a -> Vector a -> a
 
