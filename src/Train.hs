@@ -6,7 +6,7 @@ LayerSpec,
 LossFn,
 squaredErrorLoss,
 logisticLoss,
-LearningRate
+LearningRate,
 trainMany
 ) where
 
