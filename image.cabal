@@ -4,6 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
+
 -- hash: 40cd6c7b2b0bb92a44889c51f5eb9b4230ffc5a695c57b76752e3e4bc7d4ca99
 
 name:           image
@@ -27,6 +28,9 @@ source-repository head
 
 library
   exposed-modules:
+      Math
+      Model
+      Train
       ImageToVector
   other-modules:
       Paths_image
@@ -40,6 +44,9 @@ library
     , hip
     , matrix
     , vector >=0.12.1.2
+    , ad
+    , normaldistribution
+
   default-language: Haskell2010
 
 executable image-exe
