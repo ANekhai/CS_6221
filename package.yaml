@@ -1,10 +1,10 @@
 name:                image
 version:             0.1.0.0
-github:              "githubuser/image"
+github:              "/image"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2020 Author name here"
+author:              "Adi Maini, Anton Nekhai"
+maintainer:          "adimaini@vt.edu"
+copyright:           "2020 Adi Maini & Anton Nekhai"
 
 extra-source-files:
 - README.md
@@ -25,6 +25,12 @@ dependencies:
 - ad
 - normaldistribution
 
+- JuicyPixels >= 3.3.5
+- filepath >= 1.4.2.1
+- hip
+- matrix 
+- vector >= 0.12.1.2
+- containers >= 0.6.2.1
 
 library:
   source-dirs: src
