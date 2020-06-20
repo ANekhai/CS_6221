@@ -2,7 +2,6 @@
 
 module Train 
 (
-LayerSpec,
 LossFn,
 squaredErrorLoss,
 logisticLoss,
