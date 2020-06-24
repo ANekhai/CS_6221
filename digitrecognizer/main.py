@@ -1,39 +1,60 @@
-from flask import Flask, redirect, url_for, request, render_template, Response, jsonify, redirect
+from flask import Flask, render_template, request
+from scipy.misc import imsave,imread, imresize
 import numpy as np
-from util import base64_to_pil
-import test
+import keras.models
+import re
+import base64
+
+import sys 
+import os
+sys.path.append(os.path.abspath("./model"))
+from load import *
 
 # Declare a flask app
 app = Flask(__name__)
+global model, graph
+model, graph = init()
 
+    
+def parseImage(imgData):
+    # parse canvas bytes and save as output.png
+    imgstr = re.search(b'base64,(.*)', imgData).group(1)
+    with open('output.png','wb') as output:
+        output.write(base64.decodebytes(imgstr))
 
-def model_predict(img, model):
-    print(img)
-    preimage = img.resize((28,28))
-    preimg = preimage.convert("L")
-    img = np.reshape(preimg,(28,28))
-    subimg = np.reshape(img,(-1,784))
-    preds = model.predict(subimg)
-    return preds
+def base64_to_pil(img_base64):
+    """
+    Convert base64 image data to PIL image
+    """
+    image_data = re.sub('^data:image/.+;base64,', '', img_base64)
+    pil_image = Image.open(BytesIO(base64.b64decode(image_data)))
+    return pil_image
 
-
-@app.route('/', methods=['GET'])
+@app.route('/')
 def index():
     # Main page
     return render_template('index.html')
 
-
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    if request.method == 'POST':
-        # Get the image from post request
-        img = base64_to_pil(request.json)
-        preds = model_predict(img, test)
-        result = str(preds)
-        return jsonify(result=result)
-    print("end")
-    return None
+    # get data from drawing canvas and save as image
+    parseImage(request.get_data())
 
+    # read parsed image back in 8-bit, black and white mode (L)
+    x = imread('output.png', mode='L')
+    x = np.invert(x)
+    x = imresize(x,(28,28))
+
+    # reshape image data for use in neural network
+    x = x.reshape(1,28,28,1)
+    with graph.as_default():
+        out = model.predict(x)
+        print(out)
+        print(np.argmax(out, axis=1))
+        response = np.array_str(np.argmax(out, axis=1))
+        return response 
 
 if __name__ == '__main__':
-    app.run(port=5002, threaded=False)
+    app.debug = True
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

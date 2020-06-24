@@ -1,12 +1,13 @@
 import numpy as np
 import keras.models
 from scipy.misc import imread, imresize,imshow
-import tensorflow as tf
+import tensorflow 
+from tensorflow.python.framework import ops
 
-from keras.models import Sequential
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Flatten
+from tensorflow.keras.layers import Conv2D, MaxPooling2D
 
 def init():
     num_classes = 10
@@ -27,10 +28,10 @@ def init():
     print("Loaded Model from disk")
 
     #compile and evaluate loaded model
-    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adadelta(), metrics=['accuracy'])
+    model.compile(loss=tensorflow.keras.losses.categorical_crossentropy, optimizer=tensorflow.keras.optimizers.Adadelta(), metrics=['accuracy'])
     #loss,accuracy = model.evaluate(X_test,y_test)
     #print('loss:', loss)
     #print('accuracy:', accuracy)
-    graph = tf.get_default_graph()
+    graph = ops.get_default_graph()
 
     return model, graph

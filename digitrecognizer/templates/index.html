@@ -1,32 +1,47 @@
-{% extends "base.html" %} {% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Handwritten Digit Recognition using Neural Networks in Haskell</title>
+	<link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
 
-<div class="main">
-  <div class="title">
-    <h3>数字在线识别</h3>
-    <!-- <p>
-      <small>A web app demo</small>
-    </p> -->
-  </div>
+<body>
+		<h1>Handwritten Digit Recognition using Neural Networks in Haskell</h1>
 
-  <div class="panel">
-    <input id="file-upload" class="hidden" type="file" accept="image/x-png,image/gif,image/jpeg" />
-    <label for="file-upload" id="file-drag" class="upload-box">
-      <div id="upload-caption">拖拽上传或点击上传</div>
-      <img id="image-preview" class="hidden" />
-    </label>
-  </div>
-  <div style="margin-bottom: 2rem;">
-    <input type="button" value="识别" class="button" onclick="submitImage();" />
-    <input type="button" value="清除" class="button" onclick="clearImage();" />
-  </div>
 
-  <div id="image-box">
-    <img id="image-display" />
-    <div id="pred-result" class="hidden"></div>
-    <svg id="loader" class="hidden" viewBox="0 0 32 32" width="32" height="32">
-      <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
-    </svg>
-  </div>
-</div>
+		<div class="centered">
+		<a href="https://github.com/ANekhai/CS_6221/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+			<canvas id="canvas" width="128" height="128"></canvas>
+		</div>
 
-{% endblock %}
+		<div class="centered">
+			<input type="button" class="myButton" value="Predict" style="">
+			<input type="button" id="clearButton" value="Clear" style="">
+		</div>
+
+		<div class="centered">
+			<h1 id="result"></h1>
+		</div>
+
+
+  		<script src="{{url_for('static',filename='jquery-3.2.0.min.js')}}"></script>
+	    <script src="{{url_for('static',filename='index.js')}}"></script>
+	    <script type="text/javascript">
+	   		$(".myButton").click(function(){
+	   			$('#result').text('  Predicting...');
+	   			var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+	   			var canvasObj = document.getElementById("canvas");
+	   			var img = canvasObj.toDataURL('image/png');
+	   			$.ajax({
+	   				type: "POST",
+	   				url: $SCRIPT_ROOT + "/predict/",
+	   				data: img,
+	   				success: function(data){
+	   					$('#result').text('Predicted Output: ' + data);
+	   				}
+	   			});
+	   		});
+	   </script>
+</body>
+</html>

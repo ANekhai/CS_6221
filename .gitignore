@@ -1,3 +1,5 @@
 /MNIST_DATA/training
 /MNIST_DATA/testing
 .stack-work/
+digitrecognizer/.vscode/settings.json
+digitrecognizer/env
