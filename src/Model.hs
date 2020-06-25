@@ -18,7 +18,6 @@ getRandomModel
 ) where 
 
 import Control.Monad
-import Data.Random.Normal
 import Data.Matrix (Matrix)
 import Data.Vector (Vector)
 import qualified Data.Vector as V
@@ -60,8 +59,11 @@ getRandomModel :: Dimension -> [LayerSpec] -> IO (Model Double)
 getRandomModel inputDimension layerSpecs = do 
     let inputSizes = inputDimension : map fst layerSpecs 
     layers <- forM (zip inputSizes layerSpecs) $ \(m, (n, activation)) -> do
-        weights <- fmap (M.fromList n m) $ replicateM (m * n) $ normalIO --TODO: change this so it generates weights ~N(0,1)
-        bias <- fmap V.fromList $ replicateM n $ normalIO
+        weights <- fmap (M.fromList n m) $ replicateM (m * n) $ gaussDouble 1 --TODO: change this so it generates weights ~N(0,1)
+        bias <- fmap V.fromList $ replicateM n $ gaussDouble 1
         return (Layer (LP weights bias) activation)
     return (Model layers)
 --TODO: Implement convolution and pooling layers for a CNN
+
+fromFile :: FilePath
+fromFile = undefined

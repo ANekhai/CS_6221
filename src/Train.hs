@@ -6,7 +6,7 @@ LossFn,
 squaredErrorLoss,
 logisticLoss,
 LearningRate,
-trainMany
+runBatchlessTraining
 ) where
 
 import Model
@@ -39,20 +39,27 @@ addParams (Model layers) (Model diffs) = Model (zipWith addLayer layers diffs)
 type LearningRate = Double
 
 train :: LearningRate -> LossFn -> Model Double -> Vector Double ->
-         Vector Double -> (Model Double, Double)
-train rate lossFn model x y =
+         Vector Double -> Model Double
+train eta loss model x y =
     let (loss, gradient) = grad' modelLoss model
-    in (addParams model (fmap ((-rate)*) gradient), loss)
+    in addParams model (fmap ((-eta)*) gradient)
     where 
         modelLoss :: forall b. Scalar b => Model b -> b
         modelLoss model =
-            lossFn (eval model (V.map realToFrac x)) (V.map realToFrac y)
+            loss (eval model (V.map realToFrac x)) (V.map realToFrac y)
 
-trainMany :: LearningRate -> LossFn -> Model Double -> [(Vector Double, Vector Double)] ->
-             (Model Double, [Double])
-trainMany _ _ m [] = (m, [])
-trainMany rate lossFn m ((x, y) : examples) = (m', loss : losses)
+
+trainList :: LearningRate -> LossFn -> Model Double -> [(Vector Double, Vector Double)] ->
+             Model Double
+trainList _ _ m [] = m
+trainList eta loss m ((x, y) : xs) = m'
     where
-        (m1, loss) = train rate lossFn m x y
-        (m', losses) = trainMany rate lossFn m1 examples
+        new_m = train eta loss m x y
+        m' = trainList eta loss new_m xs
 
+
+runBatchlessTraining :: LearningRate -> LossFn -> [[(Vector Double, Vector Double)]] -> Model Double -> Model Double
+runBatchlessTraining _ _ [] model = model
+runBatchlessTraining eta loss (epoch : remaining) m =
+    runBatchlessTraining eta loss remaining $ trainList eta loss m epoch
+    

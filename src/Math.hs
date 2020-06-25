@@ -7,9 +7,12 @@ logistic,
 softMax,
 convolve,
 maxPool,
-averagePool
+averagePool,
+gaussDouble
 ) where
 
+import System.Random
+import System.Environment
 import Data.Matrix (Matrix)
 import Data.Vector (Vector)
 import qualified Data.Matrix as M
@@ -29,9 +32,7 @@ dot x y = V.sum $ V.zipWith (*) x y
 relu :: (Ord a, Num a) => Vector a -> Vector a
 relu = V.map f
     where
-        f x
-            | x < 0     = 0
-            | otherwise = x
+        f = max 0
 
 
 -- Another typically used nonlinear activation function for ML
@@ -63,3 +64,9 @@ maxPool = undefined
 
 averagePool :: (Floating a) => Matrix a -> Matrix a
 averagePool = undefined
+
+gaussDouble :: Double -> IO Double
+gaussDouble stdev = do
+    x1 <- randomIO
+    x2 <- randomIO
+    return $ stdev * sqrt (-2 * log x1) * cos (2 * pi * x2)
