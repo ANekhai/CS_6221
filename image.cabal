@@ -9,7 +9,7 @@ cabal-version: 1.12
 
 name:           image
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/image#readme>
+description:    Please see the README on GitHub at <https://github.com/ANekhai/CS_6221#readme>
 homepage:       https://github.com//image#readme
 bug-reports:    https://github.com//image/issues
 author:         Adi Maini, Anton Nekhai
@@ -46,6 +46,10 @@ library
     , vector >=0.12.1.2
     , ad
     , normaldistribution
+    , HaPy == 0.1.*
+
+  extra-libraries: 
+      HSrts-ghc8.8.3
 
   default-language: Haskell2010
 
