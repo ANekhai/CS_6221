@@ -5,6 +5,11 @@ import System.Environment
 import System.Directory
 import System.FilePath.Posix ((</>))
 
+import Model
+import Train
+import Utils
+import Data.Vector (Vector)
+
 main :: IO ()
 main = do
 
@@ -13,7 +18,7 @@ main = do
     -- mat <- to2DMatrix "images/test_image.jpg" (100, 100)
     -- writeFile "images/test_image.txt" (show mat)
 
-    -- if you want to writesee the resolution, use this: 
+    -- if you want to writesee the resolution, use this:
     -- toWriteImage "images/test_image.jpg" "images/test_image_output.jpg" (100, 100)
 
     args <- getArgs
@@ -21,14 +26,11 @@ main = do
                                    directory = Nothing, help = Nothing}
     parameters <- parseArgs args empty_params
 
-
-    -- let train_filepath = "MNIST_data/training"
-
+    --TODO: Implement a monadic way to check parameters
+        -- Check if directory, batches, epochs defined for training
+        -- read input model from infile for running the model
 
     
-
-    --list_fp <- traverseDir train_filepath (=="None")
---    shuffled_list <- shuffle list_fp
 
     return ()
 
@@ -39,42 +41,45 @@ type Parameter = (String, String)
 
 addParameter :: Parameters -> Parameter -> Parameters
 addParameter params (flag, x)
-    | flag == "-h" = Parameters {mode = mode params, infile = infile params, batches = batches params, 
+    | flag == "-h" = Parameters {mode = mode params, infile = infile params, batches = batches params,
                                  epochs = epochs params, directory = directory params, help = Just True}
-    | flag == "-m" = Parameters {mode = Just x, infile = infile params, batches = batches params, 
+    | flag == "-m" = Parameters {mode = Just x, infile = infile params, batches = batches params,
                                  epochs = epochs params, directory = directory params, help = help params}
-    | flag == "-f" = Parameters {mode = mode params, infile = Just x, batches = batches params, 
+    | flag == "-f" = Parameters {mode = mode params, infile = Just x, batches = batches params,
                                  epochs = epochs params, directory = directory params, help = help params}
-    | flag == "-b" = Parameters {mode = mode params, infile = infile params, batches = Just $ read x, 
+    | flag == "-b" = Parameters {mode = mode params, infile = infile params, batches = Just $ read x,
                                  epochs = epochs params, directory = directory params, help = help params}
-    | flag == "-e" = Parameters {mode = mode params, infile = infile params, batches = batches params, 
+    | flag == "-e" = Parameters {mode = mode params, infile = infile params, batches = batches params,
                                  epochs = Just $ read x, directory = directory params, help = help params}
-    | flag == "-d" = Parameters {mode = mode params, infile = infile params, batches = batches params, 
-                                 epochs = epochs params, directory = Just x, help = help params}                                                      
-    | otherwise = error "Unknown parameter used"
-
-
+    | flag == "-d" = Parameters {mode = mode params, infile = infile params, batches = batches params,
+                                 epochs = epochs params, directory = Just x, help = help params}
+    | otherwise = params
 
 
 parseArgs :: [String] -> Parameters -> IO Parameters
 parseArgs [] params = return params
-parseArgs (flag:x:xs) params = do
-    let added = addParameter params (flag,x)
+parseArgs (flag : x : xs) params = do
+    let added_params = addParameter params (flag, x)
         next = if flag == "-h" then x:xs else xs
-    parseArgs next added >>= return 
-    
+    parseArgs next added_params >>= return
+parseArgs (flag:xs) params = do
+    let added_params = addParameter params (flag, "")
+    parseArgs xs added_params
+
 
 getTrainingFiles :: FilePath -> IO [(FilePath, FilePath)]
 getTrainingFiles training_dir = do
     labels <- listDirectory training_dir -- should be a list ['0', '1', '2' ... '9']
     let subdirs = map (training_dir </> ) labels
-        labelled_subdirs = zip labels subdirs
-    
-    filepaths <- forM labelled_subdirs (\(label, dp) -> do
+        labelled_subdirs = zip subdirs labels
+
+    filepaths <- forM labelled_subdirs (\(dp, label) -> do
         contents <- listDirectory dp
         let fps = map (dp </>) contents
-        return (map ((,) label) fps)
+        return $ zip fps $ repeat label
         )
    -- training_files <- getFiles labelled_subdirs
     return $ concat filepaths
+
+--TODO: can add code to log epoch and batch used monadically
 
