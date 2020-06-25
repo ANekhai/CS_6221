@@ -28,7 +28,7 @@ def transform():
         It then converts it to a numpy array. 
     """
     # read parsed image back in 8-bit, black and white mode (L), and resize
-    img = Image.open('output.png').convert('L').resize((img_width, img_height))
+    img = Image.open(output_file).convert('L').resize((img_width, img_height))
     # convert Image object to numpy array
     img_numpy = np.array(img, dtype=int)
     # reshape image data for use in neural network
