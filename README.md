@@ -1,4 +1,4 @@
-# Handwritten Digit Recognition with a Neural Network on Haskell
+# Handwritten Digit Recognition with a Neural Network in Haskell
 
 The repository contains a neural network written from scratch on Haskell, with accompanying Flask app that allows a user to draw a digit to be predicted on. Some features of the project include: 
 
