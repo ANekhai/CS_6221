@@ -15,20 +15,14 @@ app = Flask(__name__)
 global model, graph
 model, graph = init()
 
+import base64
+
     
 def parseImage(imgData):
     # parse canvas bytes and save as output.png
     imgstr = re.search(b'base64,(.*)', imgData).group(1)
     with open('output.png','wb') as output:
-        output.write(base64.decodebytes(imgstr))
-
-def base64_to_pil(img_base64):
-    """
-    Convert base64 image data to PIL image
-    """
-    image_data = re.sub('^data:image/.+;base64,', '', img_base64)
-    pil_image = Image.open(BytesIO(base64.b64decode(image_data)))
-    return pil_image
+        output.write(base64.b64decode(imgstr))
 
 @app.route('/')
 def index():
@@ -55,6 +49,4 @@ def predict():
         return response 
 
 if __name__ == '__main__':
-    app.debug = True
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=9091)
