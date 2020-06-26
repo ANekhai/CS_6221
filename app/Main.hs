@@ -5,9 +5,12 @@ import System.Environment
 import System.Directory
 import System.FilePath.Posix ((</>))
 
+import Params
 import Model
+import Math
 import Train
 import Utils
+import Image
 import Data.Vector (Vector)
 
 main :: IO ()
@@ -21,39 +24,29 @@ main = do
     -- if you want to writesee the resolution, use this:
     -- toWriteImage "images/test_image.jpg" "images/test_image_output.jpg" (100, 100)
 
-    args <- getArgs
-    let empty_params = Parameters {mode = Nothing, infile = Nothing, batches = Nothing, epochs = Nothing,
-                                   directory = Nothing, help = Nothing}
-    parameters <- parseArgs args empty_params
+    -- args <- getArgs
+    -- let empty_params = Parameters {mode = Nothing, modelFile = Nothing, batches = Nothing, epochs = Nothing,
+    --                                directory = Nothing, help = Nothing}
+    -- parameters <- parseArgs args empty_params
 
     --TODO: Implement a monadic way to check parameters
         -- Check if directory, batches, epochs defined for training
         -- read input model from infile for running the model
-
     
+    -- TODO: Rewrite this hardcoded training algorithm
+    -- Setting up algorithm
+    let epochs = 5
+        layers = [(30, relu), (30, sigmoid), (10, softMax)]
+        base_dir = "~/MNISTtrain"
+    training_paths <- getTrainingFiles base_dir
+    training_set <- mapM_ (\(path, n) -> do 
+            let l = readLabel n
+            img <- getImageVector base_dir (28,28)
+            return (img, l)
+            ) training_paths
+
 
     return ()
-
-data Parameters = Parameters {mode :: Maybe String, infile :: Maybe FilePath, batches :: Maybe Int,
-                          epochs :: Maybe Int, directory :: Maybe FilePath, help :: Maybe Bool}
-
-type Parameter = (String, String)
-
-addParameter :: Parameters -> Parameter -> Parameters
-addParameter params (flag, x)
-    | flag == "-h" = Parameters {mode = mode params, infile = infile params, batches = batches params,
-                                 epochs = epochs params, directory = directory params, help = Just True}
-    | flag == "-m" = Parameters {mode = Just x, infile = infile params, batches = batches params,
-                                 epochs = epochs params, directory = directory params, help = help params}
-    | flag == "-f" = Parameters {mode = mode params, infile = Just x, batches = batches params,
-                                 epochs = epochs params, directory = directory params, help = help params}
-    | flag == "-b" = Parameters {mode = mode params, infile = infile params, batches = Just $ read x,
-                                 epochs = epochs params, directory = directory params, help = help params}
-    | flag == "-e" = Parameters {mode = mode params, infile = infile params, batches = batches params,
-                                 epochs = Just $ read x, directory = directory params, help = help params}
-    | flag == "-d" = Parameters {mode = mode params, infile = infile params, batches = batches params,
-                                 epochs = epochs params, directory = Just x, help = help params}
-    | otherwise = params
 
 
 parseArgs :: [String] -> Parameters -> IO Parameters

@@ -3,7 +3,7 @@ module Math
 mult,
 dot,
 relu,
-logistic,
+sigmoid,
 softMax,
 convolve,
 maxPool,
@@ -37,8 +37,8 @@ relu = V.map f
 
 -- Another typically used nonlinear activation function for ML
 -- helps convert to values between 0 and 1 which is useful for generating probabilities
-logistic :: (Floating a) => Vector a -> Vector a
-logistic = V.map f
+sigmoid :: (Floating a) => Vector a -> Vector a
+sigmoid = V.map f
     where 
         f x = exp x / (1 + exp x)
 
@@ -65,6 +65,8 @@ maxPool = undefined
 averagePool :: (Floating a) => Matrix a -> Matrix a
 averagePool = undefined
 
+-- Simple (though probably not the best) normal distribution based on the Box-Muller transform
+-- From Get a Brain Neural Network
 gaussDouble :: Double -> IO Double
 gaussDouble stdev = do
     x1 <- randomIO

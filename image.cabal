@@ -31,7 +31,9 @@ library
       Math
       Model
       Train
-      ImageToVector
+      Image
+      Utils
+      Params
   other-modules:
       Paths_image
   hs-source-dirs:
@@ -45,7 +47,6 @@ library
     , matrix
     , vector >=0.12.1.2
     , ad
-    , normaldistribution
     , random
     , directory
     , unix

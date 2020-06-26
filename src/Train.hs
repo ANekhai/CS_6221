@@ -39,27 +39,28 @@ addParams (Model layers) (Model diffs) = Model (zipWith addLayer layers diffs)
 type LearningRate = Double
 
 train :: LearningRate -> LossFn -> Model Double -> Vector Double ->
-         Vector Double -> Model Double
-train eta loss model x y =
+         Vector Double -> (Model Double, Double)
+train eta lossFunction model x y =
     let (loss, gradient) = grad' modelLoss model
-    in addParams model (fmap ((-eta)*) gradient)
-    where 
+    in (addParams model (fmap ((-eta)*) gradient), loss)
+        where 
         modelLoss :: forall b. Scalar b => Model b -> b
         modelLoss model =
-            loss (eval model (V.map realToFrac x)) (V.map realToFrac y)
+            lossFunction (eval model (V.map realToFrac x)) (V.map realToFrac y)
 
 
 trainList :: LearningRate -> LossFn -> Model Double -> [(Vector Double, Vector Double)] ->
-             Model Double
-trainList _ _ m [] = m
-trainList eta loss m ((x, y) : xs) = m'
+             (Model Double, [Double])
+trainList _ _ m [] = (m, [])
+trainList eta lossFunction m ((x, y) : xs) = (m', loss : losses)
     where
-        new_m = train eta loss m x y
-        m' = trainList eta loss new_m xs
+        (new_m, loss) = train eta lossFunction m x y
+        (m', losses) = trainList eta lossFunction new_m xs
 
 
-runBatchlessTraining :: LearningRate -> LossFn -> [[(Vector Double, Vector Double)]] -> Model Double -> Model Double
-runBatchlessTraining _ _ [] model = model
-runBatchlessTraining eta loss (epoch : remaining) m =
-    runBatchlessTraining eta loss remaining $ trainList eta loss m epoch
+runBatchlessTraining :: LearningRate -> LossFn -> [[(Vector Double, Vector Double)]] -> (Model Double, [Double]) -> (Model Double, [Double])
+runBatchlessTraining _ _ [] (model, _ ) = (model, [])
+runBatchlessTraining eta lossFunction (epoch : remaining) (model, losses) = (new_model, concat $ new_losses : losses : [])
+    where
+    (new_model, new_losses) = runBatchlessTraining eta lossFunction remaining $ trainList eta lossFunction model epoch
     
