@@ -57,4 +57,4 @@ def predict():
     return (res.text)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9091, debug=True)
+    app.run(debug=True)
