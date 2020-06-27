@@ -1,25 +1,31 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
-
 import ImageToVector
+import Web.Scotty
 import System.FilePath.Posix (splitExtension)
+import Data.Text.Lazy.Encoding (decodeUtf8)
 
 main :: IO ()
 main = do
+    server 
 
-    -- if you just want the 2D matrix output from the image
-    -- define the number of pixels (or dimensions) of the image you want
-    -- mat <- to2DMatrix "images/test_image.jpg" (100, 100)
-    -- writeFile "images/test_image.txt" (show mat)
+server = scotty 5000 $ do
 
-    -- if you want to writesee the resolution, use this: 
-    -- toWriteImage "images/test_image.jpg" "images/test_image_output.jpg" (100, 100)
+    -- get "/" $ text "foobar"
 
-    let train_filepath = 'MNIST_data/training'
-    let chunk_size = 10
+    -- endpoint for our prediction call from Flask app
+    post "/prediction" $ do  
+        -- get parameter filepath from the POST call
+        fp <-  param "filepath"
+        text $ decodeUtf8 fp
 
-    list_fp <- traverseDir train_filepath "None"
-    shuff_list <- take chunk_size $ shuffle list_fp
+    get "/" $ text "Server is running.."
 
-    train_image = do
-        vectors = fmap labelAndTrain shuff_list 
+    --DRAFT - what this would look like 
+    -- post "/prediction" $ do  
+    --     fp <-  param "filepath"
+    --     text $ predict $ transpose $ flatten $ getImageVector $ TL.decodeUtf8 fp
+    -- where 'predict' function type signature is Vector -> [Int] or similar and 
+    -- returns the prediction

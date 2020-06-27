@@ -4,12 +4,11 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
-
--- hash: 40cd6c7b2b0bb92a44889c51f5eb9b4230ffc5a695c57b76752e3e4bc7d4ca99
+-- hash: 2c0091f0c50fc4a8ddfe52f73021d454a264dcdc3c7d169e5d4d877b58dfe5d2
 
 name:           image
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/ANekhai/CS_6221#readme>
+description:    Please see the README on GitHub at <https://github.com/githubuser/image#readme>
 homepage:       https://github.com//image#readme
 bug-reports:    https://github.com//image/issues
 author:         Adi Maini, Anton Nekhai
@@ -28,29 +27,30 @@ source-repository head
 
 library
   exposed-modules:
+      ImageToVector
       Math
       Model
       Train
-      ImageToVector
   other-modules:
       Paths_image
   hs-source-dirs:
       src
   build-depends:
       JuicyPixels >=3.3.5
+    , ad
     , base >=4.7 && <5
     , containers >=0.6.2.1
+    , directory >=1.3.6.1
     , filepath >=1.4.2.1
     , hip
     , matrix
-    , vector >=0.12.1.2
-    , ad
     , normaldistribution
-    , HaPy == 0.1.*
-
-  extra-libraries: 
-      HSrts-ghc8.8.3
-
+    , random-shuffle >=0.0.4
+    , regex-tdfa >=1.3.1.0
+    , scotty == 0.11.6
+    , vector >=0.12.1.2
+    , wai-extra 
+    
   default-language: Haskell2010
 
 executable image-exe
@@ -62,13 +62,23 @@ executable image-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       JuicyPixels >=3.3.5
+    , ad
     , base >=4.7 && <5
     , containers >=0.6.2.1
+    , directory >=1.3.6.1
     , filepath >=1.4.2.1
     , hip
     , image
     , matrix
+    , normaldistribution
+    , random-shuffle >=0.0.4
+    , regex-tdfa >=1.3.1.0
+    , scotty ==0.11.6
     , vector >=0.12.1.2
+    , wai-extra
+    , wai
+    , text
+    , bytestring 
   default-language: Haskell2010
 
 test-suite image-test
@@ -81,11 +91,17 @@ test-suite image-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       JuicyPixels >=3.3.5
+    , ad
     , base >=4.7 && <5
     , containers >=0.6.2.1
+    , directory >=1.3.6.1
     , filepath >=1.4.2.1
     , hip
     , image
     , matrix
+    , normaldistribution
+    , random-shuffle >=0.0.4
+    , regex-tdfa >=1.3.1.0
+    , scotty ==0.11.6
     , vector >=0.12.1.2
   default-language: Haskell2010
