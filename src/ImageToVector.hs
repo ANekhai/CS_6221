@@ -3,8 +3,8 @@
 module ImageToVector (
   to2DMatrix,
   toWriteImage,
-  traverseDir, 
-  labelAndTrain
+  -- traverseDir, 
+  -- labelAndTrain
 ) where
 
 import Codec.Picture         
@@ -22,79 +22,79 @@ import qualified Graphics.Image.Interface as Interface
 import Data.Word (Word8)
 import qualified Data.Matrix as M
 import System.FilePath.Posix (splitExtension)
-import Text.Regex.TDFA
-import System.Random
-import Control.Monad
-import System.Directory
-import System.FilePath
-import System.Posix.Files
-import Numeric.Matrix (flatten)
-import Data.StorableVector (transpose)
+-- import Text.Regex.TDFA
+-- import System.Random
+-- import Control.Monad
+-- import System.Directory
+-- import System.FilePath
+-- import System.Posix.Files
+-- import Numeric.Matrix (flatten)
+-- import Data.StorableVector (transpose)
 
--- | Traverse from 'top' directory and return all the files by
--- filtering out the 'exclude' predicate.
-traverseDir :: FilePath -> (FilePath -> Bool) -> IO [FilePath]
-traverseDir top exclude = do
-  ds <- getDirectoryContents top
-  paths <- forM (filter (not.exclude) ds) $ \d -> do
-    let path = top </> d
-    s <- getFileStatus path
-    if isDirectory s
-      then traverseDir path exclude
-      else return [path]
-  return (concat paths)
+-- -- | Traverse from 'top' directory and return all the files by
+-- -- filtering out the 'exclude' predicate.
+-- traverseDir :: FilePath -> (FilePath -> Bool) -> IO [FilePath]
+-- traverseDir top exclude = do
+--   ds <- getDirectoryContents top
+--   paths <- forM (filter (not.exclude) ds) $ \d -> do
+--     let path = top </> d
+--     s <- getFileStatus path
+--     if isDirectory s
+--       then traverseDir path exclude
+--       else return [path]
+--   return (concat paths)
 
-labelAndTrain :: Either FilePath String -> Vector
-labelAndTrain fp 
-  | (fp =~ "/0/") = do 
-    label_list ++ ['0']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/1/") = do 
-    label_list ++ ['1']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/2/") = do 
-    label_list ++ ['2']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/3/") = do 
-    label_list ++ ['3']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/4/") = do 
-    label_list ++ ['4']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/5/") = do 
-    label_list ++ ['5']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/6/") = do 
-    label_list ++ ['6']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/7/") = do 
-    label_list ++ ['7']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/8/") = do 
-    label_list ++ ['8']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  | (fp =~ "/9/") = do 
-    label_list ++ ['9']
-    img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
-    return img_vect
-  where dim1 = 10
-        dim2 = 10
+-- labelAndTrain :: Either FilePath String -> Vector
+-- labelAndTrain fp 
+--   | (fp =~ "/0/") = do 
+--     label_list ++ ['0']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/1/") = do 
+--     label_list ++ ['1']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/2/") = do 
+--     label_list ++ ['2']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/3/") = do 
+--     label_list ++ ['3']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/4/") = do 
+--     label_list ++ ['4']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/5/") = do 
+--     label_list ++ ['5']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/6/") = do 
+--     label_list ++ ['6']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/7/") = do 
+--     label_list ++ ['7']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/8/") = do 
+--     label_list ++ ['8']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   | (fp =~ "/9/") = do 
+--     label_list ++ ['9']
+--     img_vect <- transpose $ flatten $ to2DMatrix fp (dim1, dim2)
+--     return img_vect
+--   where dim1 = 10
+--         dim2 = 10
 
--- shuffles a list
-shuffle :: [a] -> IO [a]
-shuffle [] = return []
-shuffle xs = do randomPosition <- getStdRandom (randomR (0, length xs - 1))
-                let (left, (a:right)) = splitAt randomPosition xs
-                fmap (a:) (shuffle (left ++ right))
+-- -- shuffles a list
+-- shuffle :: [a] -> IO [a]
+-- shuffle [] = return []
+-- shuffle xs = do randomPosition <- getStdRandom (randomR (0, length xs - 1))
+--                 let (left, (a:right)) = splitAt randomPosition xs
+--                 fmap (a:) (shuffle (left ++ right))
 
 -- takes an image filepath and outputs a 2D matrix
 to2DMatrix :: FilePath  -> (Int, Int) -> IO (Maybe (M.Matrix Int)) 
