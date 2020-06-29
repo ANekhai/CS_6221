@@ -6,6 +6,8 @@ LossFn,
 squaredErrorLoss,
 logisticLoss,
 LearningRate,
+train,
+trainList,
 runBatchlessTraining
 ) where
 
@@ -42,7 +44,7 @@ train :: LearningRate -> LossFn -> Model Double -> Vector Double ->
          Vector Double -> (Model Double, Double)
 train eta lossFunction model x y =
     let (loss, gradient) = grad' modelLoss model
-    in (addParams model (fmap ((-eta)*) gradient), loss)
+    in (addParams model (fmap ((- eta) *) gradient), loss)
         where 
         modelLoss :: forall b. Scalar b => Model b -> b
         modelLoss model =

@@ -11,10 +11,11 @@ Layer(..),
 LinearParams(..),
 evalLinear,
 Scalar,
-Activation,
+Activation (..),
 evalLayer,
 eval,
-getRandomModel
+getRandomModel,
+toFile
 ) where 
 
 import Control.Monad
@@ -66,7 +67,7 @@ getRandomModel :: Dimension -> [LayerSpec] -> IO (Model Double)
 getRandomModel inputDimension layerSpecs = do 
     let inputSizes = inputDimension : map fst layerSpecs 
     layers <- forM (zip inputSizes layerSpecs) $ \(m, (n, activation)) -> do
-        weights <- fmap (M.fromList n m) $ replicateM (m * n) $ gaussDouble 1 --TODO: change this so it generates weights ~N(0,1)
+        weights <- fmap (M.fromList n m) $ replicateM (m * n) $ gaussDouble 1
         bias <- fmap V.fromList $ replicateM n $ gaussDouble 1
         return (Layer (LP weights bias) activation)
     return (Model layers)
@@ -118,8 +119,8 @@ fromFiles :: FilePath -> FilePath -> IO (Model Double)
 fromFiles structure weights = undefined
     
     
-toFile :: Model Double -> FilePath -> IO ()
-toFile model file = do
+toFile :: FilePath -> Model Double -> IO ()
+toFile file model = do
     handle <- openFile file WriteMode
     let model_state = getInternals $ layers model
     hPutStr handle (unlines $ foldr f [] model_state)

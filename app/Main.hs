@@ -4,6 +4,7 @@ import Control.Monad
 import System.Environment
 import System.Directory
 import System.FilePath.Posix ((</>))
+import Data.List (isPrefixOf)
 
 import Params
 import Model
@@ -15,15 +16,6 @@ import Data.Vector (Vector)
 
 main :: IO ()
 main = do
-
-    -- if you just want the 2D matrix output from the image
-    -- define the number of pixels (or dimensions) of the image you want
-    -- mat <- to2DMatrix "images/test_image.jpg" (100, 100)
-    -- writeFile "images/test_image.txt" (show mat)
-
-    -- if you want to writesee the resolution, use this:
-    -- toWriteImage "images/test_image.jpg" "images/test_image_output.jpg" (100, 100)
-
     -- args <- getArgs
     -- let empty_params = Parameters {mode = Nothing, modelFile = Nothing, batches = Nothing, epochs = Nothing,
     --                                directory = Nothing, help = Nothing}
@@ -36,16 +28,25 @@ main = do
     -- TODO: Rewrite this hardcoded training algorithm
     -- Setting up algorithm
     let epochs = 5
-        layers = [(30, relu), (30, sigmoid), (10, softMax)]
-        base_dir = "~/MNISTtrain"
+        layers = [(30, Activation sigmoid), (10, Activation relu)]
+        base_dir = "/home/anton/MNIST_data/"
     training_paths <- getTrainingFiles base_dir
-    training_set <- mapM_ (\(path, n) -> do 
-            let l = readLabel n
-            img <- getImageVector base_dir (28,28)
-            return (img, l)
-            ) training_paths
+    training_files <- mapM (fileToImage (28,28)) training_paths
+    shuffled <- shuffle training_files
 
+    untrainedModel <- getRandomModel 784 layers
+    toFile "/home/anton/premodel.cfg" untrainedModel
 
+    putStrLn "Beginning Training."
+    
+    let (trainedModel, losses) = trainList 0.00000000000000000000000000000000000001 squaredErrorLoss untrainedModel (take 1000 shuffled)
+    
+    putStrLn "Training losses: "
+    -- mapM_ putStrLn (map show $ takeNth 5 losses)
+    mapM_ putStrLn (map show losses)
+
+    toFile "/home/anton/postmodel.cfg" trainedModel
+    
     return ()
 
 
@@ -62,17 +63,24 @@ parseArgs (flag:xs) params = do
 
 getTrainingFiles :: FilePath -> IO [(FilePath, FilePath)]
 getTrainingFiles training_dir = do
-    labels <- listDirectory training_dir -- should be a list ['0', '1', '2' ... '9']
+    subfiles <- listDirectory training_dir -- should be a list ['0', '1', '2' ... '9']
+    let labels = filter (not . isPrefixOf ".") subfiles
     let subdirs = map (training_dir </> ) labels
         labelled_subdirs = zip subdirs labels
 
     filepaths <- forM labelled_subdirs (\(dp, label) -> do
         contents <- listDirectory dp
-        let fps = map (dp </>) contents
+        let images = filter (not . isPrefixOf ".") contents
+            fps = map (dp </>) images
         return $ zip fps $ repeat label
         )
    -- training_files <- getFiles labelled_subdirs
     return $ concat filepaths
 
---TODO: can add code to log epoch and batch used monadically
 
+fileToImage :: (Int, Int) -> (FilePath, FilePath) -> IO (Vector Double, Vector Double)
+fileToImage dims (fp, n) = do
+    let label = readLabel n
+    image <- getImageVector fp dims
+    return (image, label)
+    

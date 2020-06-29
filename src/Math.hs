@@ -31,8 +31,9 @@ dot x y = V.sum $ V.zipWith (*) x y
 -- typical nonlinear activation function for ML purposes which eliminates negative values
 relu :: (Ord a, Num a) => Vector a -> Vector a
 relu = V.map f
-    where
-        f = max 0
+    where f x
+            | x > 0 = x
+            | otherwise = 0 
 
 
 -- Another typically used nonlinear activation function for ML
@@ -40,7 +41,7 @@ relu = V.map f
 sigmoid :: (Floating a) => Vector a -> Vector a
 sigmoid = V.map f
     where 
-        f x = exp x / (1 + exp x)
+        f x = 1 / (1 + exp (-x))
 
 
 -- one last activation function, used for the last layer of a CNN
