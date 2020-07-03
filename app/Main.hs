@@ -12,6 +12,7 @@ import Math
 import Train
 import Utils
 import Image
+import Function
 import Data.Vector (Vector)
 
 main :: IO ()
@@ -28,7 +29,7 @@ main = do
     -- TODO: Rewrite this hardcoded training algorithm
     -- Setting up algorithm
     let epochs = 5
-        layers = [(30, Activation sigmoid), (10, Activation relu)]
+        layers = [(100, Activation reluFn), (10, Activation reluFn)]
         base_dir = "/home/anton/MNIST_data/"
     training_paths <- getTrainingFiles base_dir
     training_files <- mapM (fileToImage (28,28)) training_paths
@@ -39,11 +40,11 @@ main = do
 
     putStrLn "Beginning Training."
     
-    let (trainedModel, losses) = trainList 0.00000000000000000000000000000000000001 squaredErrorLoss untrainedModel (take 1000 shuffled)
+    let (trainedModel, losses) = trainList 0.002 squaredErrorLoss shuffled untrainedModel
     
     putStrLn "Training losses: "
-    -- mapM_ putStrLn (map show $ takeNth 5 losses)
-    mapM_ putStrLn (map show losses)
+    mapM_ putStrLn (map show $ takeNth 5 losses)
+    
 
     toFile "/home/anton/postmodel.cfg" trainedModel
     

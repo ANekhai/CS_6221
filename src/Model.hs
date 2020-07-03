@@ -10,9 +10,9 @@ Model(..),
 Layer(..),
 LinearParams(..),
 evalLinear,
-Scalar,
 Activation (..),
 evalLayer,
+layerAZ,
 eval,
 getRandomModel,
 toFile
@@ -26,9 +26,11 @@ import qualified Data.Vector as V
 import qualified Data.Matrix as M
 import Data.List
 import Data.String
+import System.Random
 
 import Math
 import Utils
+import Function
 
 data LinearParams a = LP (Matrix a) (Vector a)
     deriving (Show, Functor, Foldable, Traversable)
@@ -36,24 +38,27 @@ data LinearParams a = LP (Matrix a) (Vector a)
 evalLinear :: (Num a) => LinearParams a -> Vector a -> Vector a
 evalLinear (LP m b) x = V.zipWith (+) (mult m x) b
 
-
-type Scalar a = (Eq a, Ord a, Floating a, RealFrac a)
-
-newtype Activation = Activation (forall a. Scalar a => Vector a -> Vector a)
+newtype Activation = Activation (Function Double)
 
 instance Show Activation where show _ = "Activation Function"
 
+layerAZ :: Layer Double -> Vector Double -> (Vector Double, Vector Double)
+layerAZ (Layer params (Activation (Fn {f=f}))) input =
+    let z = evalLinear params input
+        a = f z
+    in (a, z)
 
+-- Add pooling and convolution layers as expansion of this and pattern matching for evaluation
 data Layer a = Layer (LinearParams a) Activation
     deriving (Show, Functor, Foldable, Traversable)
 
-evalLayer :: (Scalar a) => Layer a -> Vector a -> Vector a
-evalLayer (Layer params (Activation f)) = f . evalLinear params
+evalLayer :: Layer Double -> Vector Double -> Vector Double
+evalLayer (Layer params (Activation (Fn {f=f}))) x = f $ evalLinear params x
 
 newtype Model a = Model [Layer a]
     deriving (Show, Functor, Foldable, Traversable)
 
-eval :: (Scalar a) => Model a -> Vector a -> Vector a
+eval :: Model Double -> Vector Double -> Vector Double
 eval (Model layers) x = foldl' (flip evalLayer) x layers
 
 layers :: Model Double -> [Layer Double]
@@ -67,15 +72,13 @@ getRandomModel :: Dimension -> [LayerSpec] -> IO (Model Double)
 getRandomModel inputDimension layerSpecs = do 
     let inputSizes = inputDimension : map fst layerSpecs 
     layers <- forM (zip inputSizes layerSpecs) $ \(m, (n, activation)) -> do
-        weights <- fmap (M.fromList n m) $ replicateM (m * n) $ gaussDouble 1
-        bias <- fmap V.fromList $ replicateM n $ gaussDouble 1
+        weights <- fmap (M.fromList n m) $ replicateM (m * n) $ randomRIO (-0.5, 0.5)
+        bias <- fmap V.fromList $ replicateM n $ randomRIO (-0.5, 0.5)
         return (Layer (LP weights bias) activation)
     return (Model layers)
---TODO: Implement convolution and pooling layers for a CNN
 
 
-
---TODO: Make these monadically better with error handling
+--TODO: Make these monadically better with error handling and optional types
 
 -- reads in a file with matrix weights for the model
 -- Format of file it reads is: xDim yDim Matrix Bias all on a single line
@@ -106,12 +109,12 @@ getLayers file = do
 
 getActivation :: String -> Activation
 getActivation name
-    | name == "relu" = Activation relu
-    | name == "softmax" = Activation softMax
+    | name == "relu" = Activation reluFn
+    | name == "softmax" = Activation softMaxFn
     -- | name == "maxpool" = Activation maxPool
     -- | name == "averagepool" = Activation averagePool
     -- | name == "convolution" = Activation convolve
-    | otherwise = Activation sigmoid
+    | otherwise = Activation sigmoidFn
 
 
 

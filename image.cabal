@@ -34,6 +34,7 @@ library
       Image
       Utils
       Params
+      Function
   other-modules:
       Paths_image
   hs-source-dirs:
@@ -46,7 +47,6 @@ library
     , hip
     , matrix
     , vector >=0.12.1.2
-    , ad
     , random
     , directory
     , unix
@@ -62,8 +62,7 @@ executable image-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      JuicyPixels >=3.3.5
-    , base >=4.7 && <5
+      base >=4.7 && <5 
     , containers >=0.6.2.1
     , filepath >=1.4.2.1
     , hip
