@@ -7,7 +7,8 @@ module Function (
     reluFn,
     sigmoidFn,
     softMaxFn,
-    convFn
+    convFn,
+    sigmoid -- to apply to images before ML
 ) where
 
 import Data.Vector (Vector)

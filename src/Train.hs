@@ -57,9 +57,9 @@ getDeltas (LFn {dF=dF}) (x, y) model =
     let azs = feedForward model x
         (out : as) = map (fst) azs
         zs = map (snd) azs
-        dCost = dF out y --TODO: must multiply this with sigma' (zLast) check for other errors in backprop ON ITTTTT
+        dCost = dF out y
         deltas = backpropagate model dCost zs
-    in (deltas, reverse (out:as)) --TODO: Verify this
+    in (deltas, reverse (out:as))
 
 
 stochasticGD :: LearningRate -> LossFunction Double -> (Vector Double, Vector Double) -> Model Double -> (Model Double, Double)
@@ -67,7 +67,7 @@ stochasticGD eta lossFunc (x, y) model =
     let (deltas, as) = getDeltas lossFunc (x, y) model
         modelLoss = calculateLoss lossFunc y (head as)
         adjDeltas = map (V.map (* eta)) deltas
-        parameterAdjustment = zip (zipWith outer adjDeltas (x:as))  adjDeltas
+        parameterAdjustment = zip (zipWith outer adjDeltas (x:as))  adjDeltas -- TODO: Error comes with adding the input, as it is not passed through an activation function
         newModel = changeWeights parameterAdjustment model
     in  (newModel, modelLoss)
 
@@ -78,7 +78,7 @@ changeWeights deltas (Model layers) =
     in  Model newLayers
     where
         f ((Layer (LP w b) activation), (deltaW, deltaB)) acc =
-            (Layer (LP (M.elementwise (-) w deltaW) (V.zipWith (-) b deltaB)) activation)   : acc
+            (Layer (LP (M.elementwise (-) w deltaW) (V.zipWith (-) b deltaB)) activation) : acc
 
             
 trainList :: LearningRate -> LossFunction Double -> [(Vector Double, Vector Double)] -> Model Double -> (Model Double, [Double])
