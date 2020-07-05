@@ -6,3 +6,12 @@ digitrecognizer/model/__pycache__
 digitrecognizer/__pycache__
 digitrecognizer/env
 .vscode/
+aws_config/
+.dockerignore
+etc/
+docker 
+docker-compose.yml
+Dockerfile
+Procfile
+.elasticbeanstalk
+commands

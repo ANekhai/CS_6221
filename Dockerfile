@@ -34,9 +34,9 @@
 # COPY --from=build /opt/build/.stack-work/install/x86_64-linux/lts-15.16/8.0.2/bin .
 # COPY app /opt/myapp/
 # COPY src /opt/myapp/src
+
 # EXPOSE 5000
 # CMD ["/opt/myapp/image-exe"]
-
 
 # FROM fpco/stack-build:lts-15.16 as build
 # ADD . . 
@@ -46,13 +46,29 @@
 # EXPOSE 5000
 # CMD ["image-exe"]
 
-FROM fpco/stack-build:lts-15.16
-ADD src src
-ADD app app
-FROM ubuntu:latest
+# FROM fpco/stack-build:lts-15.16
+# ADD src src
+# ADD app app
+# ADD etc etc
+FROM ubuntu:16.04
 RUN apt-get update && apt-get install -y \
+  apt-utils \
   ca-certificates \
   libgmp-dev 
-ADD .stack-work/install/x86_64-linux-dkda49f7ca9b244180d3cfb1987cbc9743/219c4eef637de81431e864021af4dfc5a76fc6002e563868e1dfc24dcc774697/8.8.3/bin /bin/
+  # libc6 
+  # rinetd
+ADD src src
+ADD app app
+ADD etc etc
+ADD .stack-work .stack-work
+ADD .stack-work/install/x86_64-linux-dkda49f7ca9b244180d3cfb1987cbc9743/219c4eef637de81431e864021af4dfc5a76fc6002e563868e1dfc24dcc774697/8.8.3/bin/ /bin/
+# CMD gunicorn --bind 0.0.0.0:$PORT wsgi
+# RUN /etc/init.d/rinetd restart
+# RUN apk add libc6-compat gmp
+# RUN ls /usr/lib
+# RUN ldd /bin/image-exe
+RUN ldconfig
 EXPOSE 5000
-ENTRYPOINT [ "/bin/image-exe" ]
+ENV LD_LIBRARY_PATH lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}
+CMD [ "/bin/image-exe" ]
+# CMD ["/etc/init.d/rinetd restart"]

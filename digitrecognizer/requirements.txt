@@ -3,3 +3,5 @@ numpy
 Pillow
 requests
 gunicorn
+boto3
+botocore
