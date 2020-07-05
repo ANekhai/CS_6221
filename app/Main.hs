@@ -18,9 +18,10 @@ import Data.Vector (Vector, maxIndex)
 
 import Web.Scotty
 import System.FilePath.Posix (splitExtension)
-import Data.Text.Lazy.Encoding (decodeUtf8)
-import Network.HTTP
-import Network.URI (parseURI)
+-- import Data.Text.Lazy.Encoding (decodeUtf8)
+import Data.ByteString.Char8 (unpack)
+-- import Network.HTTP
+-- import Network.URI (parseURI)
 
 main :: IO ()
 main = do
@@ -35,10 +36,10 @@ main = do
     
     -- TODO: Rewrite this hardcoded training algorithm
     -- Setting up algorithm
-    let epochs = 4
-        layers = [(30, Activation sigmoidFn), (10, Activation sigmoidFn)]
-        trainDir = "/home/anton/MNIST_train"
-        testDir = "/home/anton/MNIST_test"
+    -- let epochs = 4
+    --     layers = [(30, Activation sigmoidFn), (10, Activation sigmoidFn)]
+    --     trainDir = "/home/anton/MNIST_train"
+    --     testDir = "/home/anton/MNIST_test"
 
     -- RUN TESTING ON A NEURAL NETWORK STRUCTURE FILE AND WEIGHTS FILE
     -- trainedModel <- fromFiles "/home/anton/MNIST_config/relu.cfg" "/home/anton/MNIST_config/trainedRelu.cfg"
@@ -46,17 +47,20 @@ main = do
 
     -- RUN TRAINING ON A BASE DIRECTORY
     -- untrainedModel <- getRandomModel 784 layers
-    untrainedModel <- fromFiles "/home/anton/MNIST_config/sigmoid.cfg" "/home/anton/MNIST_config/trainedSigmoid.cfg"
+    -- untrainedModel <- fromFiles "/home/anton/MNIST_config/sigmoid.cfg" "/home/anton/MNIST_config/trainedSigmoid.cfg"
 
-    putStrLn ("Beginning Training on " ++ (show epochs) ++ " epochs.")
+    -- putStrLn ("Beginning Training on " ++ (show epochs) ++ " epochs.")
     
-    trainedModel <- trainingPipeline epochs 0.01 trainDir untrainedModel
+    -- trainedModel <- trainingPipeline epochs 0.01 trainDir untrainedModel
     
-    toFile "/home/anton/trainedSigmoid.cfg" trainedModel
+    -- toFile "/home/anton/trainedSigmoid.cfg" trainedModel
 
-    percentCorrect <- testingPipeline trainedModel testDir
+    -- percentCorrect <- testingPipeline trainedModel testDir
 
-    putStrLn ("The percent correct is: " ++ (show percentCorrect))
+    -- putStrLn ("The percent correct is: " ++ (show percentCorrect))
+
+    server 
+    
     
     return ()
 
@@ -65,8 +69,9 @@ server = scotty 5000 $ do
     post "/prediction" $ do  
         -- get parameter filepath from the POST call
         fp <- param "filepath"
-        -- get the image from s3 public URL
-        text $ decodeUtf8 fp
+
+        -- let fpo = decodeUtf8 fp
+        predict getModelPredict $ unpack fp
         -- text $ img
     -- where 
     --     get url = let uri = case parseURI url of
@@ -76,12 +81,8 @@ server = scotty 5000 $ do
 
     get "/" $ text "Server is running.."
 
-    --DRAFT - what this would look like 
-    -- post "/prediction" $ do  
-    --     fp <-  param "filepath"
-    --     text $ predict $ transpose $ flatten $ getImageVector $ TL.decodeUtf8 fp
-    -- where 'predict' function type signature is Vector -> [Int] or similar and 
-    -- returns the prediction
+getModelPredict :: IO (Model Double) -> Model Double
+getModelPredict = fromFiles "sigmoid.cfg" "trainedSigmoid.cfg"
 
 parseArgs :: [String] -> Parameters -> IO Parameters
 parseArgs [] params = return params
@@ -154,9 +155,6 @@ testingPipeline model baseDir = do
             let prediction = getPrediction result
                 known = getPrediction label
             in if prediction == known then (1.0 : acc) else (0.0 : acc)
-
-
-
 
 -- helper function for testing pipeline
 tupleFeed :: Model Double -> (Vector Double, Vector Double) -> IO (Vector Double, Vector Double)
