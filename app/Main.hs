@@ -7,7 +7,6 @@ import System.FilePath.Posix ((</>))
 import Data.List (isPrefixOf)
 import System.Random.Shuffle (shuffleM)
 
-import Params
 import Model
 import Math
 import Train
@@ -25,74 +24,56 @@ import Data.ByteString.Char8 (unpack)
 
 main :: IO ()
 main = do
-    -- args <- getArgs
-    -- let empty_params = Parameters {mode = Nothing, modelFile = Nothing, batches = Nothing, epochs = Nothing,
-    --                                directory = Nothing, help = Nothing}
-    -- parameters <- parseArgs args empty_params
+    (runType:fps) <- getArgs --TODO: Implement a monadic way to check parameters
+    if runType == "train"
+        then trainAndTest fps
+        else 
+            if runType == "run"
+                then evaluateImage fps
+                else
+                    error ("Please either specify train or run as an execution mode with proper parameters")
 
-    --TODO: Implement a monadic way to check parameters
-        -- Check if directory, batches, epochs defined for training
-        -- read input model from infile for running the model
-    
-    -- TODO: Rewrite this hardcoded training algorithm
-    -- Setting up algorithm
-    -- let epochs = 4
-    --     layers = [(30, Activation sigmoidFn), (10, Activation sigmoidFn)]
-    --     trainDir = "/home/anton/MNIST_train"
-    --     testDir = "/home/anton/MNIST_test"
-
-    -- RUN TESTING ON A NEURAL NETWORK STRUCTURE FILE AND WEIGHTS FILE
-    -- trainedModel <- fromFiles "/home/anton/MNIST_config/relu.cfg" "/home/anton/MNIST_config/trainedRelu.cfg"
-    
-
-    -- RUN TRAINING ON A BASE DIRECTORY
-    -- untrainedModel <- getRandomModel 784 layers
-    -- untrainedModel <- fromFiles "/home/anton/MNIST_config/sigmoid.cfg" "/home/anton/MNIST_config/trainedSigmoid.cfg"
-
-    -- putStrLn ("Beginning Training on " ++ (show epochs) ++ " epochs.")
-    
-    -- trainedModel <- trainingPipeline epochs 0.01 trainDir untrainedModel
-    
-    -- toFile "/home/anton/trainedSigmoid.cfg" trainedModel
-
-    -- percentCorrect <- testingPipeline trainedModel testDir
-
-    -- putStrLn ("The percent correct is: " ++ (show percentCorrect))
-
-    server 
-    
-    
     return ()
 
-server = scotty 5000 $ do
-    -- endpoint for our prediction call from Flask app
-    post "/prediction" $ do  
-        -- get parameter filepath from the POST call
-        fp <- param "filepath"
+evaluateImage :: [FilePath] -> IO ()
+evaluateImage (layerFile:weightsFile:imageFile:[]) = do
+    model <- fromFiles layerFile weightsFile
+    predict model imageFile >>= putStrLn
+    return ()
+evaluateImage _ = do
+    putStrLn ("Arguments were not correct. To run model please use: ")
+    putStrLn ("image-exe run structure_file layer_weights_file image_file")
+    putStrLn ("Please try again.")
+    error ("Incorrect arguments")
 
-        -- let fpo = decodeUtf8 fp
-        predict getModelPredict $ unpack fp
-        -- text $ img
-    -- where 
-    --     get url = let uri = case parseURI url of
-    --                         Nothing -> error $ "Invalid URI: " ++ url
-    --                         Just u -> u in 
-    --                     simpleHTTP (defaultGETRequest_ uri) >>= getResponseBody
 
-    get "/" $ text "Server is running.."
 
-getModelPredict :: IO (Model Double) -> Model Double
-getModelPredict = fromFiles "sigmoid.cfg" "trainedSigmoid.cfg"
+trainAndTest :: [FilePath] -> IO ()
+trainAndTest (layerSpec:trainDir:testDir:[]) = do
+    layers <- getLayers layerSpec
+    untrainedModel <- getRandomModel 784 layers
 
-parseArgs :: [String] -> Parameters -> IO Parameters
-parseArgs [] params = return params
-parseArgs (flag : x : xs) params = do
-    let added_params = addParameter params (flag, x)
-        next = if flag == "-h" then x:xs else xs
-    parseArgs next added_params >>= return
-parseArgs (flag:xs) params = do
-    let added_params = addParameter params (flag, "")
-    parseArgs xs added_params
+    let epochs = 1
+        trainingRate = 0.01
+    
+    putStrLn ("Beginning Training on " ++ (show epochs) ++ " epoch(s). Writing every 100th loss value")
+
+    trainedModel <- trainingPipeline epochs trainingRate trainDir untrainedModel
+
+    putStrLn ("Training done. Writing model to file.")
+    toFile "trainedSigmoid.cfg" trainedModel
+
+    putStrLn ("Running testing.")
+    percentCorrect <- testingPipeline trainedModel testDir
+
+    putStrLn ("The percent correct is: " ++ (show percentCorrect))
+
+    return ()
+trainAndTest _ = do 
+    putStrLn ("Arguments were not correct. To train model please use: ")
+    putStrLn ("image-exe train structure_file training_dir_path testing_dir_path")
+    putStrLn ("Please try again.")
+    error ("Incorrect arguments")
 
 
 getImageFiles :: FilePath -> IO [(FilePath, FilePath)]
@@ -132,7 +113,9 @@ trainingPipeline epochs eta baseDir untrainedModel = do
     let training_epochs = replicate epochs training_files
     shuffled <- mapM (shuffleM) training_epochs
     
-    let (trainedModel, losses) = trainList eta squaredErrorLoss (concat shuffled) untrainedModel
+    -- let (trainedModel, losses) = trainList eta squaredErrorLoss (concat shuffled) untrainedModel
+    let (trainedModel, losses) = trainList eta squaredErrorLoss (take 10000 $ concat shuffled) untrainedModel
+
     
     mapM_ putStrLn (map show $ takeNth 100 losses)
     -- mapM_ putStrLn (map show losses)
