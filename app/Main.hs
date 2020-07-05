@@ -59,7 +59,7 @@ trainAndTest (layerSpec:trainDir:testDir:[]) = do
     putStrLn ("Running testing.")
     percentCorrect <- testingPipeline trainedModel testDir
 
-    putStrLn ("The percent correct is: " ++ (show percentCorrect))
+    putStrLn ("The percent correct is: " ++ (show $ percentCorrect * 100) ++ "%")
 
     return ()
 trainAndTest _ = do 
