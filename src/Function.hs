@@ -82,8 +82,17 @@ softMax' = undefined --TODO: fill in the undefined portion
 squaredError :: Vector Double -> Vector Double -> Double
 squaredError a y = (/2) . sum $ V.map (^2) (V.zipWith (-) a y)
 
+-- dSquaredError :: Vector Double -> Vector Double -> Vector Double
+-- dSquaredError a y = V.zipWith (-) a y
+
 dSquaredError :: Vector Double -> Vector Double -> Vector Double
-dSquaredError a y = V.zipWith (-) a y
+dSquaredError a y = V.zipWith (dSECost) a y
+
+-- A modified squared error function
+dSECost :: Double -> Double -> Double
+dSECost a y 
+--    | y == 1 && a >= y = 0
+    | otherwise        = a - y
 
 
 pad :: (Num a) => Int -> Matrix a -> Matrix a

@@ -6,6 +6,7 @@ LearningRate,
 stochasticGD,
 feedForward,
 backpropagate,
+getDeltas,
 trainList
 ) where
 
@@ -39,31 +40,35 @@ feedForward (Model (first:rest)) input =
         f ((a,z): xs) layer = (layerAZ layer a) : (a,z) : xs
 
 backpropagate :: Model Double -> Vector Double -> [Vector Double] -> [Vector Double]
-backpropagate (Model layers) dLoss zs = 
-    foldr calculateDelta [dLoss] (zip layers $ reverse zs)
+backpropagate (Model layers) dCost (zLast : zs) = 
+    let (lastLayer : rLayers) = reverse layers
+        delta0 = V.zipWith (*) dCost ((sigma' lastLayer) zLast)
+        firstBackprop = mult (M.transpose $ layerWeights lastLayer) delta0
+    in tail $ foldl calculateDelta [firstBackprop, delta0] (zip rLayers zs) -- Note: need to take the tail as the head of the list will be delta1 * weights1
     where 
-        calculateDelta ((Layer (LP w _) (Activation (Fn {f'=f'}))), z) (delta:rest) =
-            let newDelta = V.zipWith (*) (mult (M.transpose w) delta) (f' z) 
-            in  newDelta : delta : rest
+        calculateDelta (backPropDelta:rest) ((Layer (LP w _) (Activation (Fn {f'=f'}))), z) =
+            let newDelta = V.zipWith (*) backPropDelta (f' z)
+                nextBackprop = mult (M.transpose w) newDelta
+            in  nextBackprop : newDelta : rest
 
 -- Return the delta values for the model in the form of a new model
 getDeltas :: LossFunction Double -> (Vector Double, Vector Double) -> Model Double -> ([Vector Double], [Vector Double])
-getDeltas (LFn {dF=df}) (x, y) model =
+getDeltas (LFn {dF=dF}) (x, y) model =
     let azs = feedForward model x
-        (out:as) = map (fst) azs
+        (out : as) = map (fst) azs
         zs = map (snd) azs
-        dLoss = df out y
-        deltas = backpropagate model dLoss zs
-    in (deltas, (out:as))
+        dCost = dF out y --TODO: must multiply this with sigma' (zLast) check for other errors in backprop ON ITTTTT
+        deltas = backpropagate model dCost zs
+    in (deltas, reverse (out:as)) --TODO: Verify this
 
 
 stochasticGD :: LearningRate -> LossFunction Double -> (Vector Double, Vector Double) -> Model Double -> (Model Double, Double)
 stochasticGD eta lossFunc (x, y) model =
     let (deltas, as) = getDeltas lossFunc (x, y) model
         modelLoss = calculateLoss lossFunc y (head as)
-        adjDeltas = map (V.map (* (-eta))) deltas
-        weightAdjustment = zip (zipWith outer adjDeltas (reverse as))  adjDeltas
-        newModel = changeWeights weightAdjustment model
+        adjDeltas = map (V.map (* eta)) deltas
+        parameterAdjustment = zip (zipWith outer adjDeltas (x:as))  adjDeltas
+        newModel = changeWeights parameterAdjustment model
     in  (newModel, modelLoss)
 
 -- helper function for SGD
@@ -73,7 +78,7 @@ changeWeights deltas (Model layers) =
     in  Model newLayers
     where
         f ((Layer (LP w b) activation), (deltaW, deltaB)) acc =
-            (Layer (LP (M.elementwise (+) w deltaW) (V.zipWith (+) b deltaB)) activation)   : acc
+            (Layer (LP (M.elementwise (-) w deltaW) (V.zipWith (-) b deltaB)) activation)   : acc
 
             
 trainList :: LearningRate -> LossFunction Double -> [(Vector Double, Vector Double)] -> Model Double -> (Model Double, [Double])

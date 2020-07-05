@@ -2,8 +2,7 @@ module Utils (
     groupsOf,
     takeNth,
     toString,
-    readLabel,
-    shuffle
+    readLabel
 )
 where
 
@@ -17,7 +16,12 @@ groupsOf _ [] = []
 groupsOf n xs = take n xs : groupsOf n (drop n xs)
 
 takeNth :: Int -> [a] -> [a]
-takeNth n xs = [ x | i <- [1..(length xs)], x <- xs, i `mod` n == 0 ]
+takeNth n = go 0
+  where
+    go _ [] = []
+    go _ [x] = [x]
+    go 0 (x : xs) = x : go n xs
+    go i (x : xs) = go (i - 1) xs
 
 toString :: (Show a) => [a] -> String
 toString = unwords . fmap (show)
@@ -32,27 +36,3 @@ readLabel label =
   let n = read label
   in generate 10 (labelHelper n)
 
-
--- Algorithm to shuffle a list based on the Fisher Yates algorithm
--- From the HaskellWiki
--- O(nlogn)
-fisherYatesStep :: RandomGen g => (Map Int a, g) -> (Int, a) -> (Map Int a, g)
-fisherYatesStep (m, gen) (i, x) = ((insert j x . insert i (m ! j)) m, gen')
-  where
-    (j, gen') = randomR (0, i) gen
-
-fisherYates :: RandomGen g => g -> [a] -> ([a], g)
-fisherYates gen [] = ([], gen)
-fisherYates gen l = 
-  toElems $ foldl fisherYatesStep (initial (head l) gen) (numerate (tail l))
-  where
-    toElems (x, y) = (elems x, y)
-    numerate = zip [1..]
-    initial x gen = (singleton 0 x, gen)
-
-
--- a wrapper for Fisher Yates to shuffle a list without managing the random generator
-shuffle :: [a] -> IO [a]
-shuffle list = do
-    gen <- getStdGen
-    return $ fst $ fisherYates gen list

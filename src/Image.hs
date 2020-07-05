@@ -57,7 +57,7 @@ outputImage fp fpout (dim1, dim2)= do
 getImageVector :: FilePath -> (Int, Int) -> IO (Vector Double)
 getImageVector file dims= do
   (Just matrix) <- get2DMatrix file dims
-  return (V.fromList $ M.toList matrix)
+  return (normalizeImage $ M.getMatrixAsVector matrix)
 
 -- convert image pixels from Double to Word8 using Functor
 conv :: Interface.Pixel I.Y Double -> Interface.Pixel I.Y Word8 
@@ -73,4 +73,6 @@ pixelToDouble =
         then (y, (fromIntegral p:ps):pss)
         else (y, [fromIntegral p]:ps:pss))
     (0,[[]])
-    
+
+normalizeImage :: Vector Double -> Vector Double
+normalizeImage = V.map (/ 256)
