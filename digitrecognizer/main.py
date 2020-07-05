@@ -4,33 +4,33 @@ import numpy as np
 import re
 import os
 import base64
-import boto3
+# import boto3
 import requests
-from botocore.exceptions import ClientError
+import subprocess
+# from botocore.exceptions import ClientError
 # from load import *
 
 # Declare a flask app
 app = Flask(__name__)
-img_width, img_height = 10, 10
 BUCKET_NAME = 'haskell-nn'
 FILE_NAME = 'output.png'
 
 import base64
 
-def upload_file(file_name, bucket, object_name=None):
-    """Upload a file to an S3 bucket
+# def upload_file(file_name, bucket, object_name=None):
+#     """Upload a file to an S3 bucket
 
-    :param file_name: File to upload
-    :param bucket: Bucket to upload to
-    :param object_name: S3 object name. If not specified then file_name is used
-    :return: True if file was uploaded, else False
-    """
+#     :param file_name: File to upload
+#     :param bucket: Bucket to upload to
+#     :param object_name: S3 object name. If not specified then file_name is used
+#     :return: True if file was uploaded, else False
+#     """
 
-    s3 = boto3.client('s3')
-    s3.upload_file(
-        file_name, bucket, object_name, 
-        ExtraArgs={'ACL': 'public-read'}
-    )
+#     s3 = boto3.client('s3')
+#     s3.upload_file(
+#         file_name, bucket, object_name, 
+#         ExtraArgs={'ACL': 'public-read'}
+#     )
 
 def parseImage(imgData):
     # parse canvas bytes and save as output.png
@@ -50,14 +50,20 @@ def predict():
     parseImage(request.get_data())  
 
     # upload the file to s3 bucket
-    upload_file(FILE_NAME, BUCKET_NAME, FILE_NAME)
+    # upload_file(FILE_NAME, BUCKET_NAME, FILE_NAME)
 
     # define the url 
-    payload = {'filepath': 'https://haskell-nn.s3.us-east-2.amazonaws.com/' + FILE_NAME}
+    # payload = {'filepath': 'digitrecognizer/' + FILE_NAME}
     # use POST to send request to Haskell Scotty/WARP server
-    res = requests.post('http://localhost:5000/prediction', params=payload)
+    # res = requests.post('http://localhost:5000/prediction', params=payload)
 
-    return (res.text)
+    # res = subprocess.check_output(['ls'])
+
+    res = subprocess.check_output(['stack', 'build', '--exec', '"image-exe run sigmoid.cfg trainedSigmoid.cfg digitrecognizer/output.png"'])
+    
+    # res = os.popen('stack exec image-exe run sigmoid.cfg trainedSigmoid.cfg digitrecognizer/output.png').read()
+    print(res)
+    return (res)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port = 3000, debug=True)
+    app.run(host='0.0.0.0', port=9091, debug=True)

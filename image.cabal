@@ -54,8 +54,8 @@ library
     , unix
     , storablevector
     , scotty == 0.11.6
-    , Cabal
-    , process
+    -- , Cabal
+    -- , process
     , HTTP >= 4000.3.14
     -- , text
     , bytestring

@@ -3,5 +3,5 @@ numpy
 Pillow
 requests
 gunicorn
-boto3
-botocore
+# boto3
+# botocore
