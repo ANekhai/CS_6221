@@ -7,7 +7,6 @@ import System.FilePath.Posix ((</>))
 import Data.List (isPrefixOf)
 import System.Random.Shuffle (shuffleM)
 
-import Params
 import Model
 import Math
 import Train
@@ -18,52 +17,56 @@ import Data.Vector (Vector, maxIndex)
 
 main :: IO ()
 main = do
-    -- args <- getArgs
-    -- let empty_params = Parameters {mode = Nothing, modelFile = Nothing, batches = Nothing, epochs = Nothing,
-    --                                directory = Nothing, help = Nothing}
-    -- parameters <- parseArgs args empty_params
+    (runType:fps) <- getArgs --TODO: Implement a monadic way to check parameters
+    if runType == "train"
+        then trainAndTest fps
+        else 
+            if runType == "run"
+                then evaluateImage fps
+                else
+                    error ("Please either specify train or run as an execution mode with proper parameters")
 
-    --TODO: Implement a monadic way to check parameters
-        -- Check if directory, batches, epochs defined for training
-        -- read input model from infile for running the model
+    return ()
+
+evaluateImage :: [FilePath] -> IO ()
+evaluateImage (layerFile:weightsFile:imageFile:[]) = do
+    model <- fromFiles layerFile weightsFile
+    predict model imageFile >>= putStrLn
+    return ()
+evaluateImage _ = do
+    putStrLn ("Arguments were not correct. To run model please use: ")
+    putStrLn ("image-exe run structure_file layer_weights_file image_file")
+    putStrLn ("Please try again.")
+    error ("Incorrect arguments")
+
+
+
+trainAndTest :: [FilePath] -> IO ()
+trainAndTest (layerSpec:trainDir:testDir:[]) = do
+    layers <- getLayers layerSpec
+    untrainedModel <- getRandomModel 784 layers
+
+    let epochs = 1
+        trainingRate = 0.01
     
-    -- TODO: Rewrite this hardcoded training algorithm
-    -- Setting up algorithm
-    let epochs = 4
-        layers = [(30, Activation sigmoidFn), (10, Activation sigmoidFn)]
-        trainDir = "/home/anton/MNIST_train"
-        testDir = "/home/anton/MNIST_test"
+    putStrLn ("Beginning Training on " ++ (show epochs) ++ " epoch(s). Writing every 100th loss value")
 
-    -- RUN TESTING ON A NEURAL NETWORK STRUCTURE FILE AND WEIGHTS FILE
-    -- trainedModel <- fromFiles "/home/anton/MNIST_config/relu.cfg" "/home/anton/MNIST_config/trainedRelu.cfg"
-    
+    trainedModel <- trainingPipeline epochs trainingRate trainDir untrainedModel
 
-    -- RUN TRAINING ON A BASE DIRECTORY
-    -- untrainedModel <- getRandomModel 784 layers
-    untrainedModel <- fromFiles "/home/anton/MNIST_config/sigmoid.cfg" "/home/anton/MNIST_config/trainedSigmoid.cfg"
+    putStrLn ("Training done. Writing model to file.")
+    toFile "trainedSigmoid.cfg" trainedModel
 
-    putStrLn ("Beginning Training on " ++ (show epochs) ++ " epochs.")
-    
-    trainedModel <- trainingPipeline epochs 0.01 trainDir untrainedModel
-    
-    toFile "/home/anton/trainedSigmoid.cfg" trainedModel
-
+    putStrLn ("Running testing.")
     percentCorrect <- testingPipeline trainedModel testDir
 
     putStrLn ("The percent correct is: " ++ (show percentCorrect))
-    
+
     return ()
-
-
-parseArgs :: [String] -> Parameters -> IO Parameters
-parseArgs [] params = return params
-parseArgs (flag : x : xs) params = do
-    let added_params = addParameter params (flag, x)
-        next = if flag == "-h" then x:xs else xs
-    parseArgs next added_params >>= return
-parseArgs (flag:xs) params = do
-    let added_params = addParameter params (flag, "")
-    parseArgs xs added_params
+trainAndTest _ = do 
+    putStrLn ("Arguments were not correct. To train model please use: ")
+    putStrLn ("image-exe train structure_file training_dir_path testing_dir_path")
+    putStrLn ("Please try again.")
+    error ("Incorrect arguments")
 
 
 getImageFiles :: FilePath -> IO [(FilePath, FilePath)]
@@ -103,7 +106,9 @@ trainingPipeline epochs eta baseDir untrainedModel = do
     let training_epochs = replicate epochs training_files
     shuffled <- mapM (shuffleM) training_epochs
     
-    let (trainedModel, losses) = trainList eta squaredErrorLoss (concat shuffled) untrainedModel
+    -- let (trainedModel, losses) = trainList eta squaredErrorLoss (concat shuffled) untrainedModel
+    let (trainedModel, losses) = trainList eta squaredErrorLoss (take 10000 $ concat shuffled) untrainedModel
+
     
     mapM_ putStrLn (map show $ takeNth 100 losses)
     -- mapM_ putStrLn (map show losses)
@@ -126,8 +131,6 @@ testingPipeline model baseDir = do
             let prediction = getPrediction result
                 known = getPrediction label
             in if prediction == known then (1.0 : acc) else (0.0 : acc)
-
-
 
 
 -- helper function for testing pipeline

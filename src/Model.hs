@@ -18,6 +18,8 @@ sigma',
 layerWeights,
 getRandomModel,
 getModel,
+getLayers,
+getWeights,
 toFile,
 fromFiles
 ) where 
