@@ -6,5 +6,4 @@ The repository contains a neural network written from scratch on Haskell, with a
 2. Backpropagation algorithm 
 3. Gradient descrent using the AD package
 4. Image conversion using JuicyPixels and HIP libraries
-5. Flask app and deployment to Heroku
-6. Haskell server using Scotty package that exposes 'predict' function
+5. Flask app for web server and interface
