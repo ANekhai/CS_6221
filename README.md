@@ -10,5 +10,5 @@ The repository contains a neural network written from scratch on Haskell, with a
 
 # Usage
 Requirements: Python 3, GHC, Stack, Unix
-Haskell Platform (with GHC) available at: https://www.haskell.org/platform/
+Haskell Platform (with GHC) available at: https://www.haskell.org/platform/  
 Haskell Tool Stack install instructions: https://docs.haskellstack.org/en/stable/README
