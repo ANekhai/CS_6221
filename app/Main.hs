@@ -31,7 +31,11 @@ main = do
             if runType == "run"
                 then evaluateImage fps
                 else
-                    error ("Please either specify train or run as an execution mode with proper parameters")
+                    if runType == "test"
+                        then runTest fps
+                        else
+                            error ("Incorrect arguments")
+
 
     return ()
 
@@ -39,13 +43,19 @@ evaluateImage :: [FilePath] -> IO ()
 evaluateImage (layerFile:weightsFile:imageFile:[]) = do
     model <- fromFiles layerFile weightsFile
     predict model imageFile >>= putStrLn
-    return ()
 evaluateImage _ = do
     putStrLn ("Arguments were not correct. To run model please use: ")
     putStrLn ("image-exe run structure_file layer_weights_file image_file")
     putStrLn ("Please try again.")
     error ("Incorrect arguments")
 
+
+runTest :: [FilePath] -> IO ()
+runTest (layerFile:weightsFile:testDir:[]) = do
+    model <- fromFiles layerFile weightsFile
+    percentCorrect <- testingPipeline model testDir
+    putStrLn ("Percent of MNIST tests correctly predicted: " ++ (show $ percentCorrect * 100) ++ "%")
+runTest _ = error ("Incorrect arguments")
 
 
 trainAndTest :: [FilePath] -> IO ()
@@ -109,7 +119,6 @@ trainingPipeline epochs eta baseDir untrainedModel = do
 
     putStrLn "Training losses: "
     --TODO: Insert epoch training here maybe using the forM function when State monad is implemented for model
-    shuffled <- shuffleM training_files
     let training_epochs = replicate epochs training_files
     shuffled <- mapM (shuffleM) training_epochs
     
@@ -152,5 +161,5 @@ getPrediction = maxIndex
 predict :: Model Double -> FilePath -> IO String
 predict model ifp = do 
     image <- getImageVector ifp (28,28)
-    let prediction = getPrediction $ eval model image
+    let prediction = getPrediction $ eval model $ sigmoid image
     return $ show prediction 
