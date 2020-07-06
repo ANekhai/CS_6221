@@ -7,3 +7,6 @@ The repository contains a neural network written from scratch on Haskell, with a
 3. Gradient descrent algorithm
 4. Image conversion using JuicyPixels and HIP libraries
 5. Flask app for web server and interface that uses HTML/JS/CSS
+
+# Usage
+Requirements: Unix, GHC, and Stack
