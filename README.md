@@ -9,6 +9,6 @@ The repository contains a neural network written from scratch on Haskell, with a
 5. Flask app for web server and interface that uses HTML/JS/CSS
 
 # Usage
-Requirements: Python 3, GHC, Stack, Unix
+Requirements: Python 3, GHC, Stack, Unix  
 Haskell Platform (with GHC) available at: https://www.haskell.org/platform/  
 Haskell Tool Stack install instructions: https://docs.haskellstack.org/en/stable/README
