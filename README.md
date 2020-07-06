@@ -9,6 +9,14 @@ The repository contains a neural network written from scratch on Haskell, with a
 5. Flask app for web server and interface that uses HTML/JS/CSS
 
 # Usage
-Requirements: Python 3, GHC, Stack, Unix  
+Requirements: Python 3, virtualenv, GHC, Stack, Unix  
 Haskell Platform (with GHC) available at: https://www.haskell.org/platform/  
 Haskell Tool Stack install instructions: https://docs.haskellstack.org/en/stable/README
+
+# Instructions to run Flask app and predict
+You must have Stack installed in order to run the Haskell script from within the Flask app. Then follow these steps:
+1. Make a virtual environment for python: `python3 -m venv env` . Activate with `source env/bin/activate` .
+2. Run requirements.txt. `pip3 install -r requirements.txt`
+3. Run flask app. `python3 main.py`
+4. Go to `localhost:9091` on your browser to draw and get the prediction.
+5. Deactivate virtualenv with command `deactivate`
