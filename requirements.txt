@@ -1,7 +1,5 @@
-Flask==0.12.1
+Flask
 numpy
 Pillow
 requests
 gunicorn
-# boto3
-# botocore

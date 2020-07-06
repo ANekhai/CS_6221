@@ -14,5 +14,6 @@ commands
 __pycache__/
 env/
 images
+stack.yaml.lock
 
 
