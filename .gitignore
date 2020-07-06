@@ -12,6 +12,7 @@ Procfile
 .elasticbeanstalk
 commands
 __pycache__/
-test.ipynb
 env/
+images
+
 
