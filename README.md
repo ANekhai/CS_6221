@@ -9,4 +9,4 @@ The repository contains a neural network written from scratch on Haskell, with a
 5. Flask app for web server and interface that uses HTML/JS/CSS
 
 # Usage
-Requirements: Unix, GHC, and Stack
+Requirements: Python 3, Unix, GHC, Stack
