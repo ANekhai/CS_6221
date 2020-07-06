@@ -38,7 +38,7 @@ def predict():
     parseImage(request.get_data())  
 
     # call haskell script and pass in the model structure file, trained model file, and the filepath to the canvas image
-    res = subprocess.check_output(['stack', 'build', '--exec', 'image-exe run sigmoid.cfg trainedSigmoid.cfg output.png'])
+    res = subprocess.check_output(['stack', 'build', '--exec', 'image-exe run sigmoid.cfg trainedSigmoid.cfg ' + FILE_NAME])
 
     # return the prediction of the canvas image
     return (res)
