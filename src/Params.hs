@@ -31,3 +31,13 @@ addParameter params (flag, x)
     | flag == "-d" = Parameters {mode = mode params, modelFile = modelFile params, batches = batches params,
                                  epochs = epochs params, directory = Just x, help = help params}
     | otherwise = params
+
+parseArgs :: [String] -> Parameters -> IO Parameters
+parseArgs [] params = return params
+parseArgs (flag : x : xs) params = do
+    let added_params = addParameter params (flag, x)
+        next = if flag == "-h" then x:xs else xs
+    parseArgs next added_params >>= return
+parseArgs (flag:xs) params = do
+    let added_params = addParameter params (flag, "")
+    parseArgs xs added_params

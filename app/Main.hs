@@ -1,4 +1,4 @@
-module Main where
+{-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad
 import System.Environment
@@ -7,7 +7,6 @@ import System.FilePath.Posix ((</>))
 import Data.List (isPrefixOf)
 import System.Random.Shuffle (shuffleM)
 
-import Params
 import Model
 import Math
 import Train
@@ -16,54 +15,75 @@ import Image
 import Function
 import Data.Vector (Vector, maxIndex)
 
+import Web.Scotty
+import System.FilePath.Posix (splitExtension)
+-- import Data.Text.Lazy.Encoding (decodeUtf8)
+import Data.ByteString.Char8 (unpack)
+-- import Network.HTTP
+-- import Network.URI (parseURI)
+
 main :: IO ()
 main = do
-    -- args <- getArgs
-    -- let empty_params = Parameters {mode = Nothing, modelFile = Nothing, batches = Nothing, epochs = Nothing,
-    --                                directory = Nothing, help = Nothing}
-    -- parameters <- parseArgs args empty_params
+    (runType:fps) <- getArgs --TODO: Implement a monadic way to check parameters
+    if runType == "train"
+        then trainAndTest fps
+        else 
+            if runType == "run"
+                then evaluateImage fps
+                else
+                    if runType == "test"
+                        then runTest fps
+                        else
+                            error ("Incorrect arguments")
 
-    --TODO: Implement a monadic way to check parameters
-        -- Check if directory, batches, epochs defined for training
-        -- read input model from infile for running the model
-    
-    -- TODO: Rewrite this hardcoded training algorithm
-    -- Setting up algorithm
-    let epochs = 4
-        layers = [(30, Activation sigmoidFn), (10, Activation sigmoidFn)]
-        trainDir = "/home/anton/MNIST_train"
-        testDir = "/home/anton/MNIST_test"
 
-    -- RUN TESTING ON A NEURAL NETWORK STRUCTURE FILE AND WEIGHTS FILE
-    -- trainedModel <- fromFiles "/home/anton/MNIST_config/relu.cfg" "/home/anton/MNIST_config/trainedRelu.cfg"
-    
-
-    -- RUN TRAINING ON A BASE DIRECTORY
-    -- untrainedModel <- getRandomModel 784 layers
-    untrainedModel <- fromFiles "/home/anton/MNIST_config/sigmoid.cfg" "/home/anton/MNIST_config/trainedSigmoid.cfg"
-
-    putStrLn ("Beginning Training on " ++ (show epochs) ++ " epochs.")
-    
-    trainedModel <- trainingPipeline epochs 0.01 trainDir untrainedModel
-    
-    toFile "/home/anton/trainedSigmoid.cfg" trainedModel
-
-    percentCorrect <- testingPipeline trainedModel testDir
-
-    putStrLn ("The percent correct is: " ++ (show percentCorrect))
-    
     return ()
 
+evaluateImage :: [FilePath] -> IO ()
+evaluateImage (layerFile:weightsFile:imageFile:[]) = do
+    model <- fromFiles layerFile weightsFile
+    predict model imageFile >>= putStrLn
+evaluateImage _ = do
+    putStrLn ("Arguments were not correct. To run model please use: ")
+    putStrLn ("image-exe run structure_file layer_weights_file image_file")
+    putStrLn ("Please try again.")
+    error ("Incorrect arguments")
 
-parseArgs :: [String] -> Parameters -> IO Parameters
-parseArgs [] params = return params
-parseArgs (flag : x : xs) params = do
-    let added_params = addParameter params (flag, x)
-        next = if flag == "-h" then x:xs else xs
-    parseArgs next added_params >>= return
-parseArgs (flag:xs) params = do
-    let added_params = addParameter params (flag, "")
-    parseArgs xs added_params
+
+runTest :: [FilePath] -> IO ()
+runTest (layerFile:weightsFile:testDir:[]) = do
+    model <- fromFiles layerFile weightsFile
+    percentCorrect <- testingPipeline model testDir
+    putStrLn ("Percent of MNIST tests correctly predicted: " ++ (show $ percentCorrect * 100) ++ "%")
+runTest _ = error ("Incorrect arguments")
+
+
+trainAndTest :: [FilePath] -> IO ()
+trainAndTest (layerSpec:trainDir:testDir:[]) = do
+    layers <- getLayers layerSpec
+    untrainedModel <- getRandomModel 784 layers
+
+    let epochs = 1
+        trainingRate = 0.01
+    
+    putStrLn ("Beginning Training on " ++ (show epochs) ++ " epoch(s). Writing every 100th loss value")
+
+    trainedModel <- trainingPipeline epochs trainingRate trainDir untrainedModel
+
+    putStrLn ("Training done. Writing model to file.")
+    toFile "trainedSigmoid.cfg" trainedModel
+
+    putStrLn ("Running testing.")
+    percentCorrect <- testingPipeline trainedModel testDir
+
+    putStrLn ("The percent correct is: " ++ (show $ percentCorrect * 100) ++ "%")
+
+    return ()
+trainAndTest _ = do 
+    putStrLn ("Arguments were not correct. To train model please use: ")
+    putStrLn ("image-exe train structure_file training_dir_path testing_dir_path")
+    putStrLn ("Please try again.")
+    error ("Incorrect arguments")
 
 
 getImageFiles :: FilePath -> IO [(FilePath, FilePath)]
@@ -99,11 +119,12 @@ trainingPipeline epochs eta baseDir untrainedModel = do
 
     putStrLn "Training losses: "
     --TODO: Insert epoch training here maybe using the forM function when State monad is implemented for model
-    shuffled <- shuffleM training_files
     let training_epochs = replicate epochs training_files
     shuffled <- mapM (shuffleM) training_epochs
     
-    let (trainedModel, losses) = trainList eta squaredErrorLoss (concat shuffled) untrainedModel
+    -- let (trainedModel, losses) = trainList eta squaredErrorLoss (concat shuffled) untrainedModel
+    let (trainedModel, losses) = trainList eta squaredErrorLoss (take 10000 $ concat shuffled) untrainedModel
+
     
     mapM_ putStrLn (map show $ takeNth 100 losses)
     -- mapM_ putStrLn (map show losses)
@@ -127,9 +148,6 @@ testingPipeline model baseDir = do
                 known = getPrediction label
             in if prediction == known then (1.0 : acc) else (0.0 : acc)
 
-
-
-
 -- helper function for testing pipeline
 tupleFeed :: Model Double -> (Vector Double, Vector Double) -> IO (Vector Double, Vector Double)
 tupleFeed model (input, label) = do
@@ -143,5 +161,5 @@ getPrediction = maxIndex
 predict :: Model Double -> FilePath -> IO String
 predict model ifp = do 
     image <- getImageVector ifp (28,28)
-    let prediction = getPrediction $ eval model image
+    let prediction = getPrediction $ eval model $ sigmoid image
     return $ show prediction 
