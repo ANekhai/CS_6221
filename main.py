@@ -7,6 +7,8 @@ import base64
 # import boto3
 import requests
 import subprocess
+from PIL import Image
+import PIL.ImageOps
 # from botocore.exceptions import ClientError
 # from load import *
 
@@ -38,6 +40,10 @@ def parseImage(imgData):
 
     with open(FILE_NAME,'wb') as output:
         output.write(base64.b64decode(imgstr))
+
+    image = Image.open(FILE_NAME)
+    inverted_image = PIL.ImageOps.invert(image.convert('RGB'))
+    inverted_image.save(FILE_NAME)
 
 @app.route('/')
 def index():

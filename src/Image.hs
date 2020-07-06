@@ -53,7 +53,7 @@ outputImage fp fpout (dim1, dim2)= do
     let (name, _) = splitExtension fp
     I.writeImage fpout new_res
 
-
+ 
 getImageVector :: FilePath -> (Int, Int) -> IO (Vector Double)
 getImageVector file dims= do
   (Just matrix) <- get2DMatrix file dims
@@ -63,7 +63,6 @@ getImageVector file dims= do
 conv :: Interface.Pixel I.Y Double -> Interface.Pixel I.Y Word8 
 conv = fmap Interface.toWord8
 
-  
 -- convert Pixel8 image to a 2-d matrix of integers
 pixelToDouble :: Image Pixel8 -> [[Double]]
 pixelToDouble =
