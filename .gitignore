@@ -1,10 +1,6 @@
 /MNIST_DATA/training
 /MNIST_DATA/testing
 .stack-work/
-digitrecognizer/.vscode/
-digitrecognizer/model/__pycache__
-digitrecognizer/__pycache__
-digitrecognizer/env
 .vscode/
 aws_config/
 .dockerignore
@@ -15,3 +11,7 @@ Dockerfile
 Procfile
 .elasticbeanstalk
 commands
+__pycache__/
+test.ipynb
+env/
+
